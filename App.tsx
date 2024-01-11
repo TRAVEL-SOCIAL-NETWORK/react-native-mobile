@@ -5,14 +5,16 @@
  * @format
  */
 
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import type {PropsWithChildren} from 'react';
+import HomePage from './page/Homepage';
 import {
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   useColorScheme,
   View,
 } from 'react-native';
@@ -56,10 +58,50 @@ function Section({children, title}: SectionProps): React.JSX.Element {
 }
 
 function App(): React.JSX.Element {
+  const [showIntro, setShowIntro] = useState(true);
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  };
+
+  useEffect(() => {
+    const introTimer = setTimeout(() => {
+      setShowIntro(false);
+    }, 10000);
+
+    // Cleanup the timer on component unmount
+    return () => clearTimeout(introTimer);
+  }, []);
+
+  const renderContent = () => {
+    if (showIntro) {
+      return (
+        <HomePage />
+      );
+    }
+
+    return (
+      <View
+        style={{
+          backgroundColor: isDarkMode ? Colors.black : Colors.white,
+        }}>
+        <Section title="Step One">
+          Edit <Text style={styles.highlight}>App.tsx</Text> to change this
+          screen and then come back to see your edits.
+        </Section>
+        <Section title="See Your Changes">
+          <ReloadInstructions />
+        </Section>
+        <Section title="Debug">
+          <DebugInstructions />
+        </Section>
+        <Section title="Learn More">
+          Read the docs to discover what to do next:
+        </Section>
+        <LearnMoreLinks />
+      </View>
+    );
   };
 
   return (
@@ -72,25 +114,7 @@ function App(): React.JSX.Element {
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
         <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
+        {renderContent()}
       </ScrollView>
     </SafeAreaView>
   );
@@ -112,6 +136,16 @@ const styles = StyleSheet.create({
   },
   highlight: {
     fontWeight: '700',
+  },
+  introContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.primary,
+  },
+  introText: {
+    fontSize: 20,
+    color: Colors.white,
   },
 });
 
