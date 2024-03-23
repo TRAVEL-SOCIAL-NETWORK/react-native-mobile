@@ -1,11 +1,16 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, Image, ScrollView} from 'react-native';
+import store from '../../libs/redux/store';
 
 type Props = {
   navigation: any;
 };
 
 const MenuScreen = (props: Props) => {
+  const handleLogout = () => {
+    store.dispatch({type: 'LOGOUT'});
+    props.navigation.navigate('Login');
+  };
   return (
     <ScrollView>
       <View className="w-full h-full bg-gray-100">
@@ -42,7 +47,7 @@ const MenuScreen = (props: Props) => {
           <View className="flex flex-row items-center justify-center gap-4">
             <TouchableOpacity
               className="rounded-full"
-              onPress={() => props.navigation.navigate('FindAccount')}>
+              onPress={() => props.navigation.navigate('Profile')}>
               <Image
                 source={require('../../assets/avatar.jpg')}
                 className="w-20 h-20 rounded-full"
@@ -71,50 +76,55 @@ const MenuScreen = (props: Props) => {
           <View className="flex flex-row items-center justify-center gap-4">
             <TouchableOpacity
               className="flex-1 items-center justify-center bg-gray-300 h-8 rounded-lg"
-              onPress={() => props.navigation.navigate('Login')}>
+              onPress={() => props.navigation.navigate('Profile')}>
               <Text className="text-center font-semibold">Chỉnh sửa</Text>
             </TouchableOpacity>
             <TouchableOpacity
               className="flex-1 items-center justify-center bg-gray-300 h-8 rounded-lg"
-              onPress={() => props.navigation.navigate('Login')}>
+              onPress={() => props.navigation.navigate('Profile')}>
               <Text className="text-center font-semibold">
                 Xem trang cá nhân
               </Text>
             </TouchableOpacity>
           </View>
         </View>
-        <View className="flex flex-col items-start justify-between m-2 p-2 bg-white rounded-lg shadow-lg mt-2">
-          <View className="flex flex-row items-center justify-between w-full">
-            <Text className="text-lg font-bold text-start text-black">
-              Bạn bè
-            </Text>
+        <View className="flex flex-row items-start justify-between m-2 p-2 bg-white rounded-lg shadow-lg">
+          <View className="flex-1 flex-col items-center justify-between p-2 bg-white rounded-lg shadow-lg mt-2">
+            <View className="flex flex-row items-center justify-between w-full">
+              <Text className="text-lg font-bold text-center text-black">
+                Bạn bè
+              </Text>
+            </View>
+            <View className="flex flex-row items-center justify-between w-full">
+              <Text className="text-lg font-bold text-center text-black">
+                Nhóm
+              </Text>
+            </View>
+            <View className="flex flex-row items-center justify-between w-full">
+              <Text className="text-lg font-bold text-center text-black">
+                Marketplace
+              </Text>
+            </View>
           </View>
-          <View className="flex flex-row items-center justify-between w-full">
-            <Text className="text-lg font-bold text-start text-black">
-              Nhóm
-            </Text>
-          </View>
-          <View className="flex flex-row items-center justify-between w-full">
-            <Text className="text-lg font-bold text-start text-black">
-              Marketplace
-            </Text>
-          </View>
-          <View className="flex flex-row items-center justify-between w-full">
-            <Text className="text-lg font-bold text-start text-black">
-              Video trên Watch
-            </Text>
-          </View>
-          <View className="flex flex-row items-center justify-between w-full">
-            <Text className="text-lg font-bold text-start text-black">
-              Sự kiện
-            </Text>
-          </View>
-          <View className="flex flex-row items-center justify-between w-full">
-            <Text className="text-lg font-bold text-start text-black">
-              Kỷ niệm
-            </Text>
+          <View className="flex-1 flex-col items-center justify-between p-2 bg-white rounded-lg shadow-lg mt-2">
+            <View className="flex flex-row items-center justify-between w-full">
+              <Text className="text-lg font-bold text-center text-black">
+                Video trên Watch
+              </Text>
+            </View>
+            <View className="flex flex-row items-center justify-between w-full">
+              <Text className="text-lg font-bold text-center text-black">
+                Sự kiện
+              </Text>
+            </View>
+            <View className="flex flex-row items-center justify-between w-full">
+              <Text className="text-lg font-bold text-center text-black">
+                Kỷ niệm
+              </Text>
+            </View>
           </View>
         </View>
+
         <View className="flex flex-col items-start justify-between m-2 p-2 bg-white rounded-lg shadow-lg mt-2">
           <View className="flex flex-row items-center justify-between w-full">
             <Text className="text-lg font-bold text-start text-black">
@@ -130,8 +140,12 @@ const MenuScreen = (props: Props) => {
         <View className="flex flex-row items-center justify-between w-full p-2">
           <TouchableOpacity
             className="flex-1 items-center justify-center bg-gray-300 h-10 rounded-lg"
-            onPress={() => props.navigation.navigate('Login')}>
-            <Text className="text-center font-bold text-base text-black">Đăng xuất</Text>
+            onPress={() => {
+              handleLogout();
+            }}>
+            <Text className="text-center font-bold text-base text-black">
+              Đăng xuất
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

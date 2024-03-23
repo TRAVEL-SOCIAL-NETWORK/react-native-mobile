@@ -1,50 +1,43 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  Button,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, Text, TouchableOpacity, Image, ScrollView} from 'react-native';
 import Friendship from '../views/Friendship';
+import apiInstance from '../../configs/apiInstance';
 
 type Props = {
   navigation: any;
 };
 const Friends = (props: Props) => {
-  const data = [
-    {
-      id: 1,
-      name: 'Nguyễn Văn A',
-      avatar: require('../../assets/avatar.jpg'),
-      time: '1 giờ trước',
-    },
-    {
-      id: 2,
-      name: 'Nguyễn Văn B',
-      avatar: require('../../assets/avatar.jpg'),
-      time: '2 giờ trước',
-    },
-    {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/avatar.jpg'),
-      time: '3 giờ trước',
-    },
-    {
-      id: 4,
-      name: 'Nguyễn Văn D',
-      avatar: require('../../assets/avatar.jpg'),
-      time: '4 giờ trước',
-    },
-    {
-      id: 5,
-      name: 'Nguyễn Văn E',
-      avatar: require('../../assets/avatar.jpg'),
-      time: '5 giờ trước',
-    },
-  ];
+  const [suggest, setSuggest] = useState<any[]>([]);
+  const [data, setData] = useState<any[]>([]);
+  useEffect(() => {
+    fetchSuggestFriend();
+    fetchRequestFriend();
+  }, []);
+
+  const fetchSuggestFriend = async () => {
+    try {
+      const response = await apiInstance.get('/friendship/suggest-friends');
+      if (response.status !== 200) {
+        throw new Error('Error');
+      }
+      setSuggest(response.data.suggestedFriends);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchRequestFriend = async () => {
+    try {
+      const response = await apiInstance.get('/friendship/request-friendship');
+      if (response.status !== 200) {
+        throw new Error('Error');
+      }
+      setData(response.data.requests);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <View className="w-full h-full bg-gray-100">
       <View className="flex flex-row items-center justify-between bg-white">
@@ -78,7 +71,7 @@ const Friends = (props: Props) => {
             </TouchableOpacity>
             <TouchableOpacity
               className="w-20 h-10 border-gray-500 rounded-full bg-gray-300 flex items-center justify-center"
-              onPress={() => props.navigation.navigate('FindAccount')}>
+              onPress={() => props.navigation.navigate('FriendAccept')}>
               <Text className="text-xs font-bold text-center text-black">
                 Bạn bè
               </Text>
@@ -99,39 +92,55 @@ const Friends = (props: Props) => {
             </Text>
           </TouchableOpacity>
         </View>
-        {data.map((item, index) => {
-          return (
-            <Friendship
-              key={item.id}
-              id={item.id}
-              name={item.name}
-              avatar={item.avatar}
-              time={item.time}
-              request={true}
-              navigation={props.navigation}
-            />
-          );
-        })}
+        {data.length > 0 ? (
+          data.map((item, index) => {
+            return (
+              <Friendship
+                key={item._id}
+                id={item._id}
+                name={item.name}
+                avatar={item.avatar}
+                time={item.time}
+                request={true}
+                navigation={props.navigation}
+              />
+            );
+          })
+        ) : (
+          <View className="flex flex-row items-center justify-center bg-white">
+            <Text className="text-center m-4 font-semibold">
+              Không có lời mời kết bạn
+            </Text>
+          </View>
+        )}
         <View className="flex flex-row items-center justify-between pl-4 pr-4 pt-2 bg-white mt-1">
-          <View className="flex flex-row items-center justify-center gap-4 mb-2">
+          <View className="flex flex-row items-center justify-center gap-4 mb-4">
             <Text className="text-xl font-bold text-center text-black">
               Những người bạn có thể biết
             </Text>
           </View>
         </View>
-        {data.map((item, index) => {
-          return (
-            <Friendship
-              key={item.id}
-              id={item.id}
-              name={item.name}
-              avatar={item.avatar}
-              time={item.time}
-              request={false}
-              navigation={props.navigation}
-            />
-          );
-        })}
+        {suggest.length > 0 ? (
+          suggest.map((item, index) => {
+            return (
+              <Friendship
+                key={item._id}
+                id={item._id}
+                name={item.name}
+                avatar={item.avatar}
+                time={item.time}
+                request={false}
+                navigation={props.navigation}
+              />
+            );
+          })
+        ) : (
+          <View className="flex flex-row items-center justify-center bg-white">
+            <Text className="text-center m-4 font-semibold">
+              Không có người bạn nào
+            </Text>
+          </View>
+        )}
       </ScrollView>
     </View>
   );

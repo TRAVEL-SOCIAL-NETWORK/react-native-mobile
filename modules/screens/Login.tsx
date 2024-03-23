@@ -81,7 +81,7 @@ const LoginScreen = (props: Props) => {
           },
         });
         console.log('Login success');
-        props.navigation.navigate('Home');
+        props.navigation.navigate('HomePage');
       } else {
         console.error(response.data.message);
       }
@@ -101,7 +101,7 @@ const LoginScreen = (props: Props) => {
   useEffect(() => {
     const state = store.getState();
     if (state.auth.isAuthenticated) {
-      props.navigation.navigate('Home');
+      props.navigation.navigate('HomePage');
     }
   }, []);
   return (

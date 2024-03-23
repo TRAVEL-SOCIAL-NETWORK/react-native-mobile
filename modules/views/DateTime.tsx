@@ -13,7 +13,7 @@ const DateTime = (props: Props) => {
   const hours = Math.floor(time / 3600000);
   const minutes = Math.floor((time % 3600000) / 60000);
   const seconds = Math.floor((time % 60000) / 1000);
-
+  const day = (hours / 24).toFixed(0);
   if (hours > 168) {
     return (
       <Text className="text-sm mr-4 text-end text-black">
@@ -23,7 +23,7 @@ const DateTime = (props: Props) => {
   } else if (hours > 48) {
     return (
       <Text className="text-sm mr-4 text-end text-black">
-        {hours / 24} ngày trước
+        {day} ngày trước
       </Text>
     );
   } else if (hours > 24) {
