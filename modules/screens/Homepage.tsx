@@ -1,11 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-} from 'react-native';
+import {View, Text, TouchableOpacity, Image, ScrollView} from 'react-native';
 import store from '../../libs/redux/store';
 import Post from '../views/Post';
 import apiInstance from '../../configs/apiInstance';
@@ -48,7 +42,7 @@ const HomeScreen = (props: Props) => {
 
   return (
     <View className="w-full h-full bg-gray-100">
-      <View className="flex flex-row items-center justify-between ml-2 mr-2 bg-white">
+      <View className="flex flex-row items-center justify-between pl-2 pr-2 bg-white">
         <View>
           <Text className="text-2xl font-bold m-4 text-start text-blue-400">
             travelolo
@@ -89,14 +83,14 @@ const HomeScreen = (props: Props) => {
         </View>
       </View>
       <ScrollView onScroll={handleScroll} scrollEventThrottle={400}>
-        <View className="flex flex-row items-center justify-between ml-4 mr-2 bg-white">
+        <View className="flex flex-row items-center justify-between pr-2 pl-3 pb-2 bg-white">
           <View className="flex flex-row items-center justify-center">
             <TouchableOpacity
-              className="w-10 h-10 border border-gray-500 rounded-full"
+              className="rounded-full border-2 border-gray-300"
               onPress={() => props.navigation.navigate('NewPost')}>
               <Image
-                source={avatar || require('../../assets/avatar.jpg')}
-                className="w-10 h-10 rounded-full"
+                source={avatar || require('../../assets/avatar.png')}
+                className="w-12 h-12 rounded-full"
               />
             </TouchableOpacity>
             <TouchableOpacity

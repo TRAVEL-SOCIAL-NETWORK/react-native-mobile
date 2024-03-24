@@ -36,7 +36,7 @@ const Destination = (props: Props) => {
           onPress={() => props.navigation.navigate('Login')}
           className="rounded-lg bg-gray-300 flex items-center justify-center w-full max-h-60 mb-2">
           <Image
-            source={require('../../assets/avatar.jpg')}
+            source={require('../../assets/avatar.png')}
             width={24}
             height={24}
             className="w-full h-full rounded-lg"
@@ -72,7 +72,7 @@ const Destination = (props: Props) => {
           <View className="flex-1 flex-row items-center justify-end">
             <DateTime date={props.time} navigation={props.navigation} />
             <Image
-              source={require('../../assets/avatar.jpg')}
+              source={require('../../assets/avatar.png')}
               width={24}
               height={24}
               className="w-7 h-7 rounded-full"

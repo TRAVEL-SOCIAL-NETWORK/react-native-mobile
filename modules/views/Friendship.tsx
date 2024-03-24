@@ -40,9 +40,9 @@ const Friendship = (props: Props) => {
     <View className="flex-1 flex-row items-center justify-around bg-white pb-2 gap-2">
       <TouchableOpacity
         onPress={() => props.navigation.navigate('Login')}
-        className="w-3/8 h-20 rounded-full flex items-center justify-center">
+        className="rounded-full flex items-center justify-center border-2 border-gray-300">
         <Image
-          source={props.avatar || require('../../assets/avatar.jpg')}
+          source={props.avatar || require('../../assets/avatar.png')}
           width={20}
           height={20}
           className="w-20 h-20 rounded-full"

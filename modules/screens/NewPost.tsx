@@ -32,10 +32,10 @@ const NewPost = (props: Props) => {
       </View>
       <View className="flex flex-row items-center justify-start m-4">
         <TouchableOpacity
-          className="w-10 h-10 border border-gray-500 rounded-full"
+          className="w-10 h-10 border border-gray-500 rounded-full border-2 border-gray-300"
           onPress={() => props.navigation.navigate('NewPost')}>
           <Image
-            source={require('../../assets/avatar.jpg')}
+            source={require('../../assets/avatar.png')}
             className="w-10 h-10 rounded-full"
           />
         </TouchableOpacity>

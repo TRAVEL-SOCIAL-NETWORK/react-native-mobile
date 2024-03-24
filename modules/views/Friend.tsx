@@ -33,9 +33,9 @@ const Friend = (props: Props) => {
       <View className="flex-1 flex-row items-center justify-start gap-2">
         <TouchableOpacity
           onPress={() => {}}
-          className="w-3/8 h-20 rounded-full flex items-center justify-center pl-4">
+          className="rounded-full flex items-center justify-center  border-2 border-gray-300">
           <Image
-            source={props.avatar || require('../../assets/avatar.jpg')}
+            source={props.avatar || require('../../assets/avatar.png')}
             width={16}
             height={16}
             className="w-16 h-16 rounded-full"

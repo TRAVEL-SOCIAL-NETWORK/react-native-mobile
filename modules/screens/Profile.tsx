@@ -8,39 +8,26 @@ type Props = {
   navigation: any;
 };
 const Profile = (props: Props) => {
+  const fullname =
+    store.getState().auth.last_name + ' ' + store.getState().auth.first_name;
+  const avatar = store.getState().auth.avatar;
   const [tabPost, setTabPost] = useState<boolean>(true);
-  const friends = [
-    {
-      id: 1,
-      name: 'Nguyen Van A',
-      avatar: require('../../assets/avatar.jpg'),
-    },
-    {
-      id: 2,
-      name: 'Nguyen Van B',
-      avatar: require('../../assets/avatar.jpg'),
-    },
-    {
-      id: 3,
-      name: 'Nguyen Van C',
-      avatar: require('../../assets/avatar.jpg'),
-    },
-    {
-      id: 4,
-      name: 'Nguyen Van D',
-      avatar: require('../../assets/avatar.jpg'),
-    },
-    {
-      id: 5,
-      name: 'Nguyen Van E',
-      avatar: require('../../assets/avatar.jpg'),
-    },
-    {
-      id: 6,
-      name: 'Nguyen Van F',
-      avatar: require('../../assets/avatar.jpg'),
-    },
-  ];
+  const [profile, setProfile] = useState<any>({});
+  const [friends, setFriends] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+  const fetchProfile = async () => {
+    try {
+      const response = await apiInstance.get('/user/profile');
+      setProfile(response.data.data);
+      setFriends(response.data.data.friends_new);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const [data, setData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
   useEffect(() => {
@@ -83,7 +70,17 @@ const Profile = (props: Props) => {
         </TouchableOpacity>
         <View className="flex flex-row items-center justify-center gap-4">
           <TouchableOpacity
-            onPress={() => props.navigation.navigate('Login')}
+            onPress={() =>
+              props.navigation.navigate('EditPublic', {
+                work: profile.work,
+                study: profile.study,
+                hobby: profile.hobby,
+                location: profile.location,
+                hometown: profile.hometown,
+                avatar: avatar,
+                background: profile.background,
+              })
+            }
             className="w-8 h-8 rounded-full flex items-center justify-center">
             <Image
               source={require('../../assets/edit.png')}
@@ -108,27 +105,29 @@ const Profile = (props: Props) => {
         <View className="flex flex-col items-center justify-center static">
           <TouchableOpacity className="rounded-full">
             <Image
-              source={require('../../assets/back.png')}
+              source={require('../../assets/background.jpg')}
               className="h-40 rounded-full opacity-50"
             />
           </TouchableOpacity>
           <TouchableOpacity
-            className="rounded-full absolute top-28"
+            className="rounded-full absolute top-28 border-2 border-gray-300"
             onPress={() => props.navigation.navigate('FindAccount')}>
             <Image
-              source={require('../../assets/avatar.jpg')}
+              source={require('../../assets/avatar.png')}
               className="w-40 h-40 rounded-full"
             />
           </TouchableOpacity>
         </View>
         <View className="flex flex-col items-center justify-center pt-32">
-          <Text className="text-center font-bold text-xl">Nguyễn Văn A</Text>
-          <Text className="text-center font-normal">{94} ban be</Text>
+          <Text className="text-center font-bold text-xl">{fullname}</Text>
+          <Text className="text-center font-normal">
+            {profile.friends_count} bạn bè
+          </Text>
         </View>
         <View className="flex flex-col items-center justify-center pt-2 gap-2 pl-4 pr-4">
           <TouchableOpacity
             className="flex items-center justify-center bg-blue-500 rounded-lg p-3 w-full"
-            onPress={() => props.navigation.navigate('Profile')}>
+            onPress={() => props.navigation.navigate('NewPost')}>
             <Text className="text-center font-semibold text-white">
               + Thêm bài viết
             </Text>
@@ -136,7 +135,17 @@ const Profile = (props: Props) => {
           <View className="flex flex-row items-center justify-between pt-2 w-full">
             <TouchableOpacity
               className="flex items-center justify-center bg-gray-300 rounded-lg p-3 w-5/6"
-              onPress={() => props.navigation.navigate('Profile')}>
+              onPress={() =>
+                props.navigation.navigate('EditPublic', {
+                  work: profile.work,
+                  study: profile.study,
+                  hobby: profile.hobby,
+                  location: profile.location,
+                  hometown: profile.hometown,
+                  avatar: avatar,
+                  background: profile.background,
+                })
+              }>
               <Text className="text-center font-semibold text-black">
                 Chỉnh sửa trang cá nhân
               </Text>
@@ -175,49 +184,87 @@ const Profile = (props: Props) => {
           <View className="flex flex-col items-center justify-center mt-2 pl-3 pr-3 gap-2 bg-white">
             <View className="flex flex-row items-center justify-between w-full mb-2 border-t-2 border-gray-200">
               <Text className="text-lg font-bold text-center text-black">
-                Chi tiet
+                Chi tiết
               </Text>
             </View>
-            <View className="flex flex-row items-center justify-start gap-2 w-full">
-              <Image
-                source={require('../../assets/work.png')}
-                className="w-5 h-5 opacity-50"
-              />
-              <Text className="text-base font-normal text-center text-black">
-                Lam viec tai FPT
-              </Text>
-            </View>
-            <View className="flex flex-row items-center justify-start gap-2 w-full">
-              <Image
-                source={require('../../assets/school.png')}
-                className="w-5 h-5 opacity-50"
-              />
-              <Text className="text-base font-normal text-center text-black">
-                Hoc tai FPT
-              </Text>
-            </View>
-            <View className="flex flex-row items-center justify-start gap-2 w-full">
-              <Image
-                source={require('../../assets/heart-fill.png')}
-                className="w-5 h-5 opacity-50"
-              />
-              <Text className="text-base font-normal text-center text-black">
-                Yeu thich tai FPT
-              </Text>
-            </View>
+            {profile.work === '' ? null : (
+              <View className="flex flex-row items-center justify-start gap-2 w-full">
+                <Image
+                  source={require('../../assets/work.png')}
+                  className="w-5 h-5 opacity-50"
+                />
+                <Text className="text-base font-normal text-center text-black">
+                  {profile.work}
+                </Text>
+              </View>
+            )}
+            {profile.study === '' ? null : (
+              <View className="flex flex-row items-center justify-start gap-2 w-full">
+                <Image
+                  source={require('../../assets/school.png')}
+                  className="w-5 h-5 opacity-50"
+                />
+                <Text className="text-base font-normal text-center text-black">
+                  {profile.study}
+                </Text>
+              </View>
+            )}
+            {profile.hobby === '' ? null : (
+              <View className="flex flex-row items-center justify-start gap-2 w-full">
+                <Image
+                  source={require('../../assets/heart-fill.png')}
+                  className="w-5 h-5 opacity-50"
+                />
+                <Text className="text-base font-normal text-center text-black">
+                  {profile.hobby}
+                </Text>
+              </View>
+            )}
+            {profile.location === '' ? null : (
+              <View className="flex flex-row items-center justify-start gap-2 w-full">
+                <Image
+                  source={require('../../assets/home.png')}
+                  className="w-5 h-5 opacity-50"
+                />
+                <Text className="text-base font-normal text-center text-black">
+                  {profile.location}
+                </Text>
+              </View>
+            )}
+            {profile.hometown === '' ? null : (
+              <View className="flex flex-row items-center justify-start gap-2 w-full">
+                <Image
+                  source={require('../../assets/address.png')}
+                  className="w-5 h-5 opacity-50"
+                />
+                <Text className="text-base font-normal text-center text-black">
+                  {profile.hometown}
+                </Text>
+              </View>
+            )}
             <View className="flex flex-row items-center justify-start gap-2 w-full">
               <Image
                 source={require('../../assets/time.png')}
                 className="w-5 h-5 opacity-50"
               />
               <Text className="text-base font-normal text-center text-black">
-                Tham gia vao 2020
+                Tham gia vào {new Date(profile.joined_at).toLocaleDateString()}
               </Text>
             </View>
             <View className="flex flex-row items-center justify-start pt-2 pb-2 border-b-2 border-gray-200">
               <TouchableOpacity
                 className="flex items-center justify-center bg-blue-200 rounded-lg p-3 w-full"
-                onPress={() => props.navigation.navigate('Profile')}>
+                onPress={() =>
+                  props.navigation.navigate('EditPublic', {
+                    work: profile.work,
+                    study: profile.study,
+                    hobby: profile.hobby,
+                    location: profile.location,
+                    hometown: profile.hometown,
+                    avatar: avatar,
+                    background: profile.background,
+                  })
+                }>
                 <Text className="text-center font-semibold text-blue-500">
                   Chỉnh sửa chi tiết công khai
                 </Text>
@@ -230,7 +277,7 @@ const Profile = (props: Props) => {
                   Bạn bè
                 </Text>
                 <Text className="text-xs font-normal text-center text-gray-400">
-                  94 bạn bè
+                  {profile.friends_count} bạn bè
                 </Text>
               </View>
               <TouchableOpacity
@@ -241,21 +288,29 @@ const Profile = (props: Props) => {
                 </Text>
               </TouchableOpacity>
             </View>
-            <View className="flex flex-row">
-              {friends.map((item, index) => {
-                return (
-                  <View key={index} className="flex flex-col items-center">
-                    <Image
-                      source={item.avatar}
-                      className="w-20 h-20 rounded-xl"
-                    />
-                    <Text className="text-base font-normal text-center text-black">
-                      {item.name}
-                    </Text>
-                  </View>
-                );
-              })}
-            </View>
+            <ScrollView horizontal={true}>
+              <View className="flex flex-row">
+                {friends.map((item, index) => {
+                  return (
+                    <TouchableOpacity
+                      onPress={() => props.navigation.navigate('Login')}
+                      key={index}
+                      className="flex flex-col items-center border-2 border-gray-300 rounded-lg">
+                      <Image
+                        source={
+                          item.avatar || require('../../assets/background.jpg')
+                        }
+                        className="w-20 h-20 fill"
+                      />
+                      <Text className="w-20 text-sm font-bold text-center text-black p-1">
+                        {item.last_name} {item.first_name}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </ScrollView>
+
             <View className="flex flex-row items-center justify-start pt-2 pb-2 border-b-2 border-gray-200">
               <TouchableOpacity
                 className="flex items-center justify-center bg-gray-300 rounded-lg p-3 w-full"
@@ -282,18 +337,18 @@ const Profile = (props: Props) => {
             <View className="flex flex-row items-center justify-between bg-white border-b-8 border-gray-200 w-full">
               <View className="flex flex-row items-center justify-center">
                 <TouchableOpacity
-                  className="w-10 h-10 border border-gray-500 rounded-full"
-                  onPress={() => props.navigation.navigate('FindAccount')}>
+                  className="border-gray-500 rounded-full border-2 border-gray-300 ml-2 mb-2"
+                  onPress={() => props.navigation.navigate('NewPost')}>
                   <Image
                     source={
                       store.getState().auth.avatar ||
-                      require('../../assets/avatar.jpg')
+                      require('../../assets/avatar.png')
                     }
-                    className="w-10 h-10 rounded-full"
+                    className="w-12 h-12 rounded-full"
                   />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => props.navigation.navigate('FindAccount')}>
+                  onPress={() => props.navigation.navigate('NewPost')}>
                   <Text className="text-center m-4 font-semibold">
                     Chia sẻ chuyến du lịch của{' '}
                     {store.getState().auth.first_name}?

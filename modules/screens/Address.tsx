@@ -85,19 +85,18 @@ const AddressScreen = (props: Props) => {
                 className="flex flex-col items-center justify-center mt-1"
                 key={item._id}>
                 <TouchableOpacity
-                  className="rounded-lg flex flex-col items-center justify-center w-24 bg-white m-1"
+                  className="rounded-lg flex flex-col items-center justify-center w-24 bg-white m-1 border-2 border-gray-300"
                   onPress={() => {
                     fetchDestination(item._id);
                   }}>
                   <Image
-                    source={require('../../assets/avatar.jpg')}
+                    source={require('../../assets/avatar.png')}
                     className="w-10 h-10 rounded-full mt-2"
                   />
-                   <Text className="text-center m-2 font-semibold">
+                  <Text className="text-center m-2 font-semibold">
                     {item.name}
                   </Text>
                 </TouchableOpacity>
-
               </View>
             );
           })}

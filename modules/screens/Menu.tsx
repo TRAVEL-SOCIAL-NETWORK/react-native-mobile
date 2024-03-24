@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, Image, ScrollView} from 'react-native';
 import store from '../../libs/redux/store';
+import apiInstance from '../../configs/apiInstance';
 
 type Props = {
   navigation: any;
@@ -10,6 +11,20 @@ const MenuScreen = (props: Props) => {
   const handleLogout = () => {
     store.dispatch({type: 'LOGOUT'});
     props.navigation.navigate('Login');
+  };
+  const [data, setData] = useState<any>({});
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await apiInstance.get('/user/info');
+      setData(response.data.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <ScrollView>
@@ -46,23 +61,23 @@ const MenuScreen = (props: Props) => {
         <View className="flex flex-col items-start justify-between m-2 p-2 bg-white rounded-lg shadow-lg ">
           <View className="flex flex-row items-center justify-center gap-4">
             <TouchableOpacity
-              className="rounded-full"
+              className="rounded-full border-2 border-gray-300"
               onPress={() => props.navigation.navigate('Profile')}>
               <Image
-                source={require('../../assets/avatar.jpg')}
+                source={require('../../assets/avatar.png')}
                 className="w-20 h-20 rounded-full"
               />
             </TouchableOpacity>
             <View className="pl-6">
-              <Text className="text-center font-bold">5</Text>
+              <Text className="text-center font-bold">{data.posts}</Text>
               <Text className="text-center font-normal">bài viết</Text>
             </View>
             <View>
-              <Text className="text-center font-bold">100</Text>
+              <Text className="text-center font-bold">{data.friends}</Text>
               <Text className="text-center font-normal">bạn bè</Text>
             </View>
             <View>
-              <Text className="text-center font-bold">50</Text>
+              <Text className="text-center font-bold">{data.destinations}</Text>
               <Text className="text-center font-normal text-xs">
                 đia điểm theo dõi
               </Text>

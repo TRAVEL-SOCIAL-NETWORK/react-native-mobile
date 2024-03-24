@@ -16,12 +16,12 @@ type Props = {
 
 const Post = (props: Props) => {
   return (
-    <View className="flex-1 flex-row items-start justify-around bg-white gap-2 mt-1.5 pb-2">
+    <View className="flex-1 flex-row items-start justify-around bg-white gap-2 mt-1.5 pb-2 pl-2">
       <TouchableOpacity
         onPress={() => props.navigation.navigate('Login')}
-        className="rounded-full flex items-center justify-center pl-2">
+        className="rounded-full flex items-center justify-center ml-2 border-2 border-gray-300">
         <Image
-          source={props.avatar || require('../../assets/avatar.jpg')}
+          source={props.avatar || require('../../assets/avatar.png')}
           width={10}
           height={10}
           className="w-10 h-10 rounded-full"
@@ -41,7 +41,7 @@ const Post = (props: Props) => {
           onPress={() => props.navigation.navigate('Login')}
           className="rounded-lg bg-gray-300 flex items-center justify-center w-full h-40 mb-2">
           <Image
-            source={require('../../assets/avatar.jpg')}
+            source={require('../../assets/avatar.png')}
             width={24}
             height={24}
             className="w-full h-40 rounded-lg"
@@ -101,7 +101,7 @@ const Post = (props: Props) => {
           onPress={() => props.navigation.navigate('Login')}
           className="h-9 flex flex-row items-center justify-start w-full gap-2 mt-2">
           <Image
-            source={require('../../assets/avatar.jpg')}
+            source={require('../../assets/avatar.png')}
             width={24}
             height={24}
             className="w-7 h-7 rounded-full"

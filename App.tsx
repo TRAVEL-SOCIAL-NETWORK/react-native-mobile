@@ -15,6 +15,7 @@ import FindAccount from './modules/screens/FindAccount';
 import VerifyScreen from './modules/screens/Verify';
 import ResetPassword from './modules/screens/ResetPassword';
 import WelcomeScreen from './modules/screens/Welcome';
+import EditInfoPublic from './modules/screens/EditInfoPublic';
 
 function App() {
   const isAuthenticated = store.getState().auth.isAuthenticated;
@@ -55,6 +56,7 @@ function App() {
               <Stack.Screen name="FriendAccept" component={FriendAccept} />
               <Stack.Screen name="Profile" component={Profile} />
               <Stack.Screen name="NewPost" component={NewPost} />
+              <Stack.Screen name="EditPublic" component={EditInfoPublic} />
             </>
           )}
         </Stack.Navigator>
