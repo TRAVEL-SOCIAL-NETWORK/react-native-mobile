@@ -2,8 +2,8 @@ import axios from 'axios';
 import store from '../libs/redux/store';
 
 const apiInstance = axios.create({
-  baseURL: 'http://192.168.1.4:5000/api',
-  timeout: 3000,
+  baseURL: 'http://192.168.1.3:5000/api',
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -11,8 +11,8 @@ const apiInstance = axios.create({
 });
 
 const apiInstanceRefresh = axios.create({
-  baseURL: 'http://192.168.1.4:5000/api',
-  timeout: 3000,
+  baseURL: 'http://192.168.1.3:5000/api',
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -53,7 +53,7 @@ apiInstance.interceptors.response.use(
       };
       const jsonString = JSON.stringify(data);
       return await apiInstanceRefresh
-        .post('/auth/refresh_token', jsonString)
+        .post('/auth/refresh-token', jsonString)
         .then(res => {
           if (res.status === 200) {
             store.dispatch({

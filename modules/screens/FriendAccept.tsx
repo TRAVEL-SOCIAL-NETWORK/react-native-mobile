@@ -61,7 +61,7 @@ const FriendAccept = (props: Props) => {
                 key={item.id}
                 id={item.id}
                 name={item.name}
-                avatar={item.avatar}
+                avatar={item.avatar !== undefined ? item.avatar : ''}
                 navigation={props.navigation}
               />
             );

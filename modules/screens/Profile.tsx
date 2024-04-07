@@ -3,6 +3,7 @@ import {Text, View, TouchableOpacity, Image, ScrollView} from 'react-native';
 import store from '../../libs/redux/store';
 import Post from '../views/Post';
 import apiInstance from '../../configs/apiInstance';
+import Modal from 'react-native-modal';
 
 type Props = {
   navigation: any;
@@ -10,10 +11,18 @@ type Props = {
 const Profile = (props: Props) => {
   const fullname =
     store.getState().auth.last_name + ' ' + store.getState().auth.first_name;
-  const avatar = store.getState().auth.avatar;
+  const avatar =
+    store.getState().auth.avatar !== null ? store.getState().auth.avatar : '';
   const [tabPost, setTabPost] = useState<boolean>(true);
   const [profile, setProfile] = useState<any>({});
   const [friends, setFriends] = useState<any[]>([]);
+  const [privacy, setPrivacy] = useState<string>('public');
+  const [oldest, setOldest] = useState<boolean>(false);
+  const [isModalVisible, setModalVisible] = useState<boolean>(false);
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
 
   useEffect(() => {
     fetchProfile();
@@ -32,17 +41,23 @@ const Profile = (props: Props) => {
   const [page, setPage] = useState(1);
   useEffect(() => {
     fetchData();
-  }, [page]);
+  }, [page, privacy, oldest]);
 
   const fetchData = async () => {
     try {
-      const response = await apiInstance.get('/posts', {
+      const response = await apiInstance.get(`/posts/user`, {
         params: {
           page,
+          privacy,
+          oldest,
         },
       });
-      console.log('loading');
-      setData([...data, ...response.data.data]);
+      console.log('loadingpost');
+      if (page === 1) {
+        setData(response.data.data);
+      } else {
+        setData([...data, ...response.data.data]);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -59,6 +74,93 @@ const Profile = (props: Props) => {
 
   return (
     <View className="h-full bg-blue-50">
+      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
+        <View className="w-full  bg-white rounded-lg p-4">
+          <Text className="text-lg font-bold text-start text-black">
+            Bộ lọc bài viết
+          </Text>
+          <Text className="text-xs font-normal text-start text-gray-500 pb-2">
+            Bài viết của bạn có thể hiển thị cho mọi người hoặc chỉ một số người
+          </Text>
+          <Text className="text-xs font-normal text-start text-gray-500 pb-2">
+            Bạn có thể chọn bộ lọc để xem bài viết của mình
+          </Text>
+          <Text className="text-lg font-bold text-start text-black pb-2">
+            Chọn quyền riêng tư
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              setPrivacy('public');
+              setModalVisible(false);
+            }}
+            className="flex flex-row items-center gap-2">
+            <Image
+              source={require('../../assets/earth.png')}
+              style={{width: 20, height: 20}}
+            />
+            <View className="w-full">
+              <Text className="text-normal font-bold ">Công khai</Text>
+              <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                Mọi người có thể xem bài viết
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setPrivacy('private');
+              setModalVisible(false);
+            }}
+            className="flex flex-row items-center gap-2">
+            <Image
+              source={require('../../assets/private.png')}
+              style={{width: 20, height: 20}}
+            />
+            <View className="w-full">
+              <Text className="text-normal font-bold ">Riêng tư</Text>
+              <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                Chỉ bạn và một số người được chọn có thể xem bài viết
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <Text className="text-lg font-bold text-start text-black pb-2">
+            Sắp xếp
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              setOldest(false);
+              setModalVisible(false);
+            }}
+            className="flex flex-row items-center gap-2">
+            <Image
+              source={require('../../assets/time.png')}
+              style={{width: 20, height: 20}}
+            />
+            <View className="w-full">
+              <Text className="text-normal font-bold ">Mới nhất</Text>
+              <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                Bài viết mới nhất sẽ hiển thị đầu tiên
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setOldest(true);
+              setModalVisible(false);
+            }}
+            className="flex flex-row items-center gap-2">
+            <Image
+              source={require('../../assets/time.png')}
+              style={{width: 20, height: 20}}
+            />
+            <View className="w-full">
+              <Text className="text-normal font-bold ">Cũ nhất</Text>
+              <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                Bài viết cũ nhất sẽ hiển thị đầu tiên
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </Modal>
       <View className="flex flex-row items-center justify-between bg-white pr-4 pl-2">
         <TouchableOpacity
           onPress={() => props.navigation.goBack()}
@@ -78,7 +180,8 @@ const Profile = (props: Props) => {
                 location: profile.location,
                 hometown: profile.hometown,
                 avatar: avatar,
-                background: profile.background,
+                background:
+                  profile.background !== undefined ? profile.background : '',
               })
             }
             className="w-8 h-8 rounded-full flex items-center justify-center">
@@ -105,7 +208,11 @@ const Profile = (props: Props) => {
         <View className="flex flex-col items-center justify-center static">
           <TouchableOpacity className="rounded-full">
             <Image
-              source={require('../../assets/background.jpg')}
+              source={
+                profile.background !== undefined
+                  ? {uri: profile.background}
+                  : require('../../assets/background.jpg')
+              }
               className="h-40 rounded-full opacity-50"
             />
           </TouchableOpacity>
@@ -113,7 +220,11 @@ const Profile = (props: Props) => {
             className="rounded-full absolute top-28 border-2 border-gray-300"
             onPress={() => props.navigation.navigate('FindAccount')}>
             <Image
-              source={require('../../assets/avatar.png')}
+              source={
+                avatar !== ''
+                  ? {uri: avatar}
+                  : require('../../assets/avatar.png')
+              }
               className="w-40 h-40 rounded-full"
             />
           </TouchableOpacity>
@@ -143,7 +254,8 @@ const Profile = (props: Props) => {
                   location: profile.location,
                   hometown: profile.hometown,
                   avatar: avatar,
-                  background: profile.background,
+                  background:
+                    profile.background !== undefined ? profile.background : '',
                 })
               }>
               <Text className="text-center font-semibold text-black">
@@ -187,7 +299,7 @@ const Profile = (props: Props) => {
                 Chi tiết
               </Text>
             </View>
-            {profile.work === '' ? null : (
+            {profile.work === '' || profile.work === undefined ? null : (
               <View className="flex flex-row items-center justify-start gap-2 w-full">
                 <Image
                   source={require('../../assets/work.png')}
@@ -198,7 +310,7 @@ const Profile = (props: Props) => {
                 </Text>
               </View>
             )}
-            {profile.study === '' ? null : (
+            {profile.study === '' || profile.study === undefined ? null : (
               <View className="flex flex-row items-center justify-start gap-2 w-full">
                 <Image
                   source={require('../../assets/school.png')}
@@ -209,7 +321,7 @@ const Profile = (props: Props) => {
                 </Text>
               </View>
             )}
-            {profile.hobby === '' ? null : (
+            {profile.hobby === '' || profile.hobby === undefined ? null : (
               <View className="flex flex-row items-center justify-start gap-2 w-full">
                 <Image
                   source={require('../../assets/heart-fill.png')}
@@ -220,7 +332,8 @@ const Profile = (props: Props) => {
                 </Text>
               </View>
             )}
-            {profile.location === '' ? null : (
+            {profile.location === '' ||
+            profile.location === undefined ? null : (
               <View className="flex flex-row items-center justify-start gap-2 w-full">
                 <Image
                   source={require('../../assets/home.png')}
@@ -231,7 +344,8 @@ const Profile = (props: Props) => {
                 </Text>
               </View>
             )}
-            {profile.hometown === '' ? null : (
+            {profile.hometown === '' ||
+            profile.hometown === undefined ? null : (
               <View className="flex flex-row items-center justify-start gap-2 w-full">
                 <Image
                   source={require('../../assets/address.png')}
@@ -328,7 +442,9 @@ const Profile = (props: Props) => {
               </View>
               <TouchableOpacity
                 className="flex flex-row items-center justify-center gap-2 pr-2"
-                onPress={() => props.navigation.navigate('Friends')}>
+                onPress={() => {
+                  setModalVisible(true);
+                }}>
                 <Text className="text-m font-bold text-center text-blue-400">
                   Bộ lọc
                 </Text>
@@ -341,8 +457,9 @@ const Profile = (props: Props) => {
                   onPress={() => props.navigation.navigate('NewPost')}>
                   <Image
                     source={
-                      store.getState().auth.avatar ||
-                      require('../../assets/avatar.png')
+                      store.getState().auth.avatar !== ''
+                        ? {uri: store.getState().auth.avatar}
+                        : require('../../assets/avatar.png')
                     }
                     className="w-12 h-12 rounded-full"
                   />
@@ -373,13 +490,15 @@ const Profile = (props: Props) => {
                 key={item._id}
                 id={item._id}
                 name={item.full_name}
-                avatar={item.avatar}
+                avatar={item.avatar !== undefined ? {uri: item.avatar} : ''}
                 user_id={item.user_id}
                 time={item.created_at}
                 status={item.content}
                 like={item.likes_count}
+                isLike={item.is_like}
                 comment={item.comments_count}
                 image={item.image}
+                destination={item.travel_destination}
                 navigation={props.navigation}
               />
             ))}

@@ -16,6 +16,8 @@ import VerifyScreen from './modules/screens/Verify';
 import ResetPassword from './modules/screens/ResetPassword';
 import WelcomeScreen from './modules/screens/Welcome';
 import EditInfoPublic from './modules/screens/EditInfoPublic';
+import SearchScreen from './modules/screens/Search';
+import PostScreen from './modules/screens/Post';
 
 function App() {
   const isAuthenticated = store.getState().auth.isAuthenticated;
@@ -57,6 +59,8 @@ function App() {
               <Stack.Screen name="Profile" component={Profile} />
               <Stack.Screen name="NewPost" component={NewPost} />
               <Stack.Screen name="EditPublic" component={EditInfoPublic} />
+              <Stack.Screen name="Search" component={SearchScreen} />
+              <Stack.Screen name="Post" component={PostScreen} />
             </>
           )}
         </Stack.Navigator>

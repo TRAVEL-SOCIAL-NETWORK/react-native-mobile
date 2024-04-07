@@ -16,33 +16,31 @@ const DateTime = (props: Props) => {
   const day = (hours / 24).toFixed(0);
   if (hours > 168) {
     return (
-      <Text className="text-sm mr-4 text-end text-black">
+      <Text className="text-xs mr-4 text-end text-black">
         {date.getDate()} tháng {date.getMonth() + 1}
       </Text>
     );
   } else if (hours > 48) {
     return (
-      <Text className="text-sm mr-4 text-end text-black">
-        {day} ngày trước
-      </Text>
+      <Text className="text-xs mr-4 text-end text-black">{day} ngày trước</Text>
     );
   } else if (hours > 24) {
-    return <Text className="text-sm mr-4 text-end text-black">Hôm qua</Text>;
+    return <Text className="text-xs mr-4 text-end text-black">Hôm qua</Text>;
   } else if (hours > 0) {
     return (
-      <Text className="text-sm mr-4 text-end text-black">
+      <Text className="text-xs mr-4 text-end text-black">
         {hours} giờ trước
       </Text>
     );
   } else if (minutes > 0) {
     return (
-      <Text className="text-sm mr-4 text-end text-black">
+      <Text className="text-xs mr-4 text-end text-black">
         {minutes} phút trước
       </Text>
     );
   } else {
     return (
-      <Text className="text-sm mr-4 text-end text-black">
+      <Text className="text-xs mr-4 text-end text-black">
         {seconds} giây trước
       </Text>
     );

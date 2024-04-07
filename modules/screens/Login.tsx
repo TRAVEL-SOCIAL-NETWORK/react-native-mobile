@@ -60,15 +60,20 @@ const LoginScreen = (props: Props) => {
           });
           console.log('Delete password');
         }
-        const {
-          access_token,
-          refresh_token,
-          id,
-          avatar,
-          first_name,
-          last_name,
-          status,
-        } = response.data;
+        let avatar = null;
+        const {access_token, refresh_token, id, first_name, last_name, status} =
+          response.data;
+        if (response.data.avatar === undefined) {
+          avatar = '';
+        } else {
+          avatar = response.data.avatar;
+        }
+        console.log('data1', avatar);
+        if (status === 'inactive') {
+          console.log('Account is not activated');
+          return;
+        }
+
         store.dispatch({
           type: 'auth/login',
           payload: {

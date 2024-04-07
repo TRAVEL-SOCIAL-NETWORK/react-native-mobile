@@ -35,7 +35,11 @@ const Friend = (props: Props) => {
           onPress={() => {}}
           className="rounded-full flex items-center justify-center  border-2 border-gray-300">
           <Image
-            source={props.avatar || require('../../assets/avatar.png')}
+            source={
+              props.avatar !== ''
+                ? {uri: props.avatar}
+                : require('../../assets/avatar.png')
+            }
             width={16}
             height={16}
             className="w-16 h-16 rounded-full"

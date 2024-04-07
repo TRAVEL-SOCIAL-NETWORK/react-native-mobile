@@ -1,33 +1,46 @@
 import React from 'react';
 import {Image, Text, TouchableOpacity, View} from 'react-native';
 import apiInstance from '../../configs/apiInstance';
-import DateTime from './DateTime';
 type Props = {
   id: number;
   name: string;
   avatar: string;
-  time: string;
-  request: boolean;
   navigation: any;
 };
 
-const Friendship = (props: Props) => {
-  const [isFriend, setIsFriend] = React.useState(false);
+const AddFriend = (props: Props) => {
   const [isRequest, setIsRequest] = React.useState(false);
   const handleRequest = async () => {
     try {
-      let response;
-      if (props.request) {
-        response = await apiInstance.post('/friendship/accept-friendship', {
-          from: props.id,
-        });
-        setIsFriend(true);
-      } else {
-        response = await apiInstance.post('/friendship/request-friendship', {
+      const response = await apiInstance.post(
+        '/friendship/request-friendship',
+        {
           to: props.id,
-        });
-        setIsRequest(true);
+        },
+      );
+      setIsRequest(true);
+
+      if (response.status !== 200) {
+        throw new Error('Error');
       }
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleCancelRequest = async () => {
+    try {
+      const response = await apiInstance.delete(
+        '/friendship/cancel-friendship',
+        {
+          data: {
+            to: props.id,
+          },
+        },
+      );
+      setIsRequest(false);
+
       if (response.status !== 200) {
         throw new Error('Error');
       }
@@ -57,33 +70,33 @@ const Friendship = (props: Props) => {
           <Text className="text-lg font-bold text-start text-black">
             {props.name}
           </Text>
-          {props.request ? (
-            <DateTime date={props.time} navigation={props.navigation} />
-          ) : null}
         </View>
         <View className="flex-1 flex-row items-center justify-between gap-2">
-          {isFriend ? null : (
+          {isRequest ? (
             <TouchableOpacity
-              className="bg-blue-500 flex-1 rounded-lg"
+              className="bg-gray-300 flex-1 rounded-lg"
+              onPress={() => {
+                handleCancelRequest();
+              }}>
+              <Text className="text-base font-bold m-2 text-black text-center">
+                Huỷ
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              className="bg-blue-100 flex-1 rounded-lg"
               onPress={() => {
                 handleRequest();
               }}>
-              <Text className="text-base font-medium m-2 text-white text-center">
-                {props.request ? 'Xác nhận' : 'Thêm bạn bè'}
+              <Text className="text-base font-bold m-2 text-blue-500 text-center">
+                Thêm bạn bè
               </Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity
-            className="bg-gray-200 flex-1 rounded-lg"
-            onPress={() => props.navigation.navigate('FindAccount')}>
-            <Text className="text-base font-medium m-2 text-black text-center">
-              {isFriend ? 'Chúng ta đã là bạn bè' : 'Xoá'}
-            </Text>
-          </TouchableOpacity>
         </View>
       </View>
     </View>
   );
 };
 
-export default Friendship;
+export default AddFriend;

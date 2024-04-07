@@ -48,7 +48,7 @@ const Friends = (props: Props) => {
         </View>
         <View>
           <TouchableOpacity
-            onPress={() => props.navigation.navigate('Login')}
+            onPress={() => props.navigation.navigate('Search')}
             className="w-8 h-8 rounded-full flex items-center justify-center m-4">
             <Image
               source={require('../../assets/search.png')}
@@ -99,7 +99,7 @@ const Friends = (props: Props) => {
                 key={item._id}
                 id={item._id}
                 name={item.name}
-                avatar={item.avatar}
+                avatar={item.avatar !== undefined ? item.avatar : ''}
                 time={item.time}
                 request={true}
                 navigation={props.navigation}
@@ -127,7 +127,7 @@ const Friends = (props: Props) => {
                 key={item._id}
                 id={item._id}
                 name={item.name}
-                avatar={item.avatar}
+                avatar={item.avatar !== undefined ? item.avatar : ''}
                 time={item.time}
                 request={false}
                 navigation={props.navigation}

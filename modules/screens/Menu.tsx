@@ -47,7 +47,7 @@ const MenuScreen = (props: Props) => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => props.navigation.navigate('Login')}
+              onPress={() => props.navigation.navigate('Search')}
               className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-300">
               <Image
                 source={require('../../assets/search.png')}
@@ -64,7 +64,11 @@ const MenuScreen = (props: Props) => {
               className="rounded-full border-2 border-gray-300"
               onPress={() => props.navigation.navigate('Profile')}>
               <Image
-                source={require('../../assets/avatar.png')}
+                source={
+                  store.getState().auth.avatar !== ''
+                    ? {uri: store.getState().auth.avatar}
+                    : require('../../assets/avatar.png')
+                }
                 className="w-20 h-20 rounded-full"
               />
             </TouchableOpacity>
@@ -85,7 +89,9 @@ const MenuScreen = (props: Props) => {
           </View>
           <View className="flex flex-row items-center justify-center gap-4 mb-2">
             <Text className="text-center font-semibold">
-              Nguyễn Văn Aanh dawda{' '}
+              {store.getState().auth.first_name +
+                ' ' +
+                store.getState().auth.last_name}
             </Text>
           </View>
           <View className="flex flex-row items-center justify-center gap-4">

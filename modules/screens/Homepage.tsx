@@ -61,7 +61,7 @@ const HomeScreen = (props: Props) => {
             />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => props.navigation.navigate('Login')}
+            onPress={() => props.navigation.navigate('Search')}
             className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
             <Image
               source={require('../../assets/search.png')}
@@ -89,7 +89,11 @@ const HomeScreen = (props: Props) => {
               className="rounded-full border-2 border-gray-300"
               onPress={() => props.navigation.navigate('NewPost')}>
               <Image
-                source={avatar || require('../../assets/avatar.png')}
+                source={
+                  avatar !== ''
+                    ? {uri: avatar}
+                    : require('../../assets/avatar.png')
+                }
                 className="w-12 h-12 rounded-full"
               />
             </TouchableOpacity>
@@ -118,13 +122,15 @@ const HomeScreen = (props: Props) => {
             key={item._id}
             id={item._id}
             name={item.full_name}
-            avatar={item.avatar}
+            avatar={item.avatar !== undefined ? {uri: item.avatar} : ''}
             user_id={item.user_id}
             time={item.created_at}
             status={item.content}
             like={item.likes_count}
+            isLike={item.is_liked}
             comment={item.comments_count}
             image={item.image}
+            destination={item.travel_destination}
             navigation={props.navigation}
           />
         ))}
