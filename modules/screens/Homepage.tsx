@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, Image, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 import store from '../../libs/redux/store';
 import Post from '../views/Post';
 import apiInstance from '../../configs/apiInstance';
@@ -12,7 +19,12 @@ const HomeScreen = (props: Props) => {
   const {avatar, first_name} = store.getState().auth;
   const [data, setData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
-
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = () => {
+    setRefreshing(true);
+    setPage(1);
+    setRefreshing(false);
+  };
   useEffect(() => {
     fetchData();
   }, [page]);
@@ -25,7 +37,11 @@ const HomeScreen = (props: Props) => {
         },
       });
       console.log('loading');
-      setData([...data, ...response.data.data]);
+      if (page === 1) {
+        setData(response.data.data);
+      } else {
+        setData([...data, ...response.data.data]);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -82,7 +98,12 @@ const HomeScreen = (props: Props) => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView onScroll={handleScroll} scrollEventThrottle={400}>
+      <ScrollView
+        onScroll={handleScroll}
+        scrollEventThrottle={10}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         <View className="flex flex-row items-center justify-between pr-2 pl-3 pb-2 bg-white">
           <View className="flex flex-row items-center justify-center">
             <TouchableOpacity
@@ -119,7 +140,7 @@ const HomeScreen = (props: Props) => {
         </View>
         {data.map((item, index) => (
           <Post
-            key={item._id}
+            key={index}
             id={item._id}
             name={item.full_name}
             avatar={item.avatar !== undefined ? {uri: item.avatar} : ''}
@@ -131,6 +152,7 @@ const HomeScreen = (props: Props) => {
             comment={item.comments_count}
             image={item.image}
             destination={item.travel_destination}
+            privacy={item.privacy}
             navigation={props.navigation}
           />
         ))}

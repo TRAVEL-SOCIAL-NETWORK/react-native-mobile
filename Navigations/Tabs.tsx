@@ -1,4 +1,4 @@
-import {Image, Text, View} from 'react-native';
+import {Image, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from '../modules/screens/Homepage';
@@ -7,25 +7,40 @@ import MenuScreen from '../modules/screens/Menu';
 import NotifyScreen from '../modules/screens/Notify';
 import AddressScreen from '../modules/screens/Address';
 
-type Props = {};
+type Props = {
+  navigation: any;
+};
 
 const Tab = createBottomTabNavigator();
 
 const Tabs = (props: Props) => {
   return (
     <Tab.Navigator
-          initialRouteName="Home"
+      initialRouteName="Home"
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: true,
-        tabBarHideOnKeyboard: false,
+        tabBarHideOnKeyboard: true,
       }}>
       <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={({route}) => ({
           tabBarIcon: ({focused}) => (
-            <View className="flex-col items-center justify-center">
+            <TouchableOpacity
+              onPress={() => {
+                if (props.navigation.isFocused()) {
+                  // Nếu đang ở trang Home và tab Home được nhấp lại, load lại trang Home
+                  props.navigation.navigate('Home', {refresh: true});
+                } else {
+                  props.navigation.navigate('Home');
+                }
+              }}
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
               <Image
                 source={require('../assets/home.png')}
                 style={{
@@ -34,7 +49,7 @@ const Tabs = (props: Props) => {
                   tintColor: focused ? '#0F9AFE' : '#666',
                 }}
               />
-            </View>
+            </TouchableOpacity>
           ),
         })}
       />

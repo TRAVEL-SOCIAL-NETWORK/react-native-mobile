@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View, TouchableOpacity, Image, ScrollView} from 'react-native';
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 import store from '../../libs/redux/store';
 import Post from '../views/Post';
 import apiInstance from '../../configs/apiInstance';
@@ -16,10 +23,16 @@ const Profile = (props: Props) => {
   const [tabPost, setTabPost] = useState<boolean>(true);
   const [profile, setProfile] = useState<any>({});
   const [friends, setFriends] = useState<any[]>([]);
-  const [privacy, setPrivacy] = useState<string>('public');
+  const [privacy, setPrivacy] = useState<string>('');
   const [oldest, setOldest] = useState<boolean>(false);
   const [isModalVisible, setModalVisible] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState(false);
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    setPage(1);
+    setRefreshing(false);
+  };
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
@@ -204,7 +217,12 @@ const Profile = (props: Props) => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView onScroll={handleScroll} scrollEventThrottle={400}>
+      <ScrollView
+        onScroll={handleScroll}
+        scrollEventThrottle={400}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         <View className="flex flex-col items-center justify-center static">
           <TouchableOpacity className="rounded-full">
             <Image
@@ -396,7 +414,7 @@ const Profile = (props: Props) => {
               </View>
               <TouchableOpacity
                 className="flex flex-row items-center justify-center gap-2 pr-2"
-                onPress={() => props.navigation.navigate('Friends')}>
+                onPress={() => props.navigation.navigate('FriendAccept')}>
                 <Text className="text-m font-bold text-center text-blue-400">
                   Xem tất cả
                 </Text>
@@ -412,7 +430,9 @@ const Profile = (props: Props) => {
                       className="flex flex-col items-center border-2 border-gray-300 rounded-lg">
                       <Image
                         source={
-                          item.avatar || require('../../assets/background.jpg')
+                          item.avatar !== undefined
+                            ? {uri: item.avatar}
+                            : require('../../assets/avatar.png')
                         }
                         className="w-20 h-20 fill"
                       />
@@ -499,6 +519,7 @@ const Profile = (props: Props) => {
                 comment={item.comments_count}
                 image={item.image}
                 destination={item.travel_destination}
+                privacy={item.privacy}
                 navigation={props.navigation}
               />
             ))}

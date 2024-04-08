@@ -1,8 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Image, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import DateTime from './DateTime';
 import store from '../../libs/redux/store';
 import apiInstance from '../../configs/apiInstance';
+import Modal from 'react-native-modal';
+
 type Props = {
   id: string;
   name: string;
@@ -15,13 +17,20 @@ type Props = {
   comment: number;
   image: string;
   destination: string;
+  privacy: string;
   navigation: any;
 };
 
 const Post = (props: Props) => {
-  const [isLiked, setIsLiked] = React.useState(props.isLike);
-  const [cmtCount, setCmtCount] = React.useState(props.comment);
-  const [likeCount, setLikeCount] = React.useState(props.like);
+  const [isLiked, setIsLiked] = useState(props.isLike);
+  const [cmtCount, setCmtCount] = useState(props.comment);
+  const [likeCount, setLikeCount] = useState(props.like);
+  const [privacy, setPrivacy] = useState(props.privacy);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
   const handleLike = async () => {
     try {
       const response = await apiInstance.post('/reaction/like', {
@@ -63,6 +72,20 @@ const Post = (props: Props) => {
       console.log(error);
     }
   };
+  const handleUpdatePrivacy = async (privacy: string) => {
+    try {
+      const response = await apiInstance.put(`/posts/privacy/${props.id}`, {
+        privacy: privacy,
+      });
+
+      if (response.data.status_code === 200) {
+        setPrivacy(privacy);
+        toggleModal();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <View className="flex-1 flex-row items-start justify-around bg-white gap-2 mt-1.5 pb-2 pl-2">
       <TouchableOpacity
@@ -80,7 +103,74 @@ const Post = (props: Props) => {
           <Text className="text-lg font-bold text-start text-black">
             {props.name}
           </Text>
-          <DateTime date={props.time} navigation={props.navigation} />
+          <View className="flex flex-row items-center justify-start">
+            <DateTime date={props.time} navigation={props.navigation} />
+            <TouchableOpacity
+              onPress={() => toggleModal()}
+              className="rounded-full flex items-center justify-center">
+              {privacy === 'public' ? null : (
+                <Image
+                  source={require('../../assets/private.png')}
+                  width={24}
+                  height={24}
+                  className="w-3 h-3"
+                />
+              )}
+            </TouchableOpacity>
+            <Modal
+              isVisible={isModalVisible}
+              onBackdropPress={toggleModal}
+              className="m-1">
+              <View className="w-full  bg-white rounded-lg p-4">
+                <Text className="text-lg font-bold text-start text-black">
+                  Ai có thể xem bài viết của bạn?
+                </Text>
+                <Text className="text-xs font-normal text-start text-gray-500 pb-2">
+                  Bài viết của bạn có thể hiển thị trên News Feed, trên trang cá
+                  nhân và trên các dịch vụ khác trên Travelolo
+                </Text>
+                <Text className="text-xs font-normal text-start text-gray-500 pb-2">
+                  Bạn có thể thay đổi ai có thể xem bài viết của bạn bất cứ lúc
+                  nào
+                </Text>
+                <Text className="text-lg font-bold text-start text-black pb-2">
+                  Chọn đối tượng
+                </Text>
+                <TouchableOpacity
+                  onPress={() => handleUpdatePrivacy('public')}
+                  className="flex flex-row items-center gap-2">
+                  <Image
+                    source={require('../../assets/earth.png')}
+                    style={{width: 20, height: 20}}
+                  />
+                  <View className="w-full">
+                    <Text className="text-normal font-bold ">Công khai</Text>
+                    <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                      Mọi người có thể xem bài viết
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleUpdatePrivacy('private')}
+                  className={
+                    privacy === 'private'
+                      ? 'flex flex-row items-center gap-2 bg-gray-200 rounded-lg'
+                      : 'flex flex-row items-center gap-2'
+                  }>
+                  <Image
+                    source={require('../../assets/private.png')}
+                    style={{width: 20, height: 20}}
+                  />
+                  <View className="w-full">
+                    <Text className="text-normal font-bold ">Riêng tư</Text>
+                    <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                      Chỉ bạn và một số người được chọn có thể xem bài viết
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </Modal>
+          </View>
         </View>
         <View className="flex-1 flex-row items-center justify-between gap-2">
           <Text className="text-sm text-start text-black">{props.status}</Text>
@@ -98,6 +188,7 @@ const Post = (props: Props) => {
               isLike: isLiked,
               comment: cmtCount,
               image: props.image,
+              privacy: props.privacy,
               destination: props.destination,
             })
           }

@@ -11,7 +11,7 @@ import store from '../../libs/redux/store';
 import apiInstance from '../../configs/apiInstance';
 import {RouteProp} from '@react-navigation/native';
 import DateTime from '../views/DateTime';
-import Comment from '../views/Comment';
+import Modal from 'react-native-modal';
 
 type RootStackParamList = {
   Post: {
@@ -26,6 +26,7 @@ type RootStackParamList = {
     comment: number;
     image: string;
     destination: string;
+    privacy: string;
   };
 };
 
@@ -54,6 +55,11 @@ const PostScreen = (props: Props) => {
     image,
     destination,
   } = props.route.params;
+  const [isModalVisible, setModalVisible] = useState(false);
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
   useEffect(() => {
     fetchCommentPost();
   }, []);
@@ -75,7 +81,12 @@ const PostScreen = (props: Props) => {
   const [isReply, setIsReply] = React.useState(false);
   const [replyId, setReplyId] = React.useState('');
   const [replyName, setReplyName] = React.useState('');
+  const [privacy, setPrivacy] = React.useState(props.route.params.privacy);
 
+  const [isModalVisiblePrivacy, setModalVisiblePrivacy] = useState(false);
+  const toggleModalPrivacy = () => {
+    setModalVisiblePrivacy(!isModalVisiblePrivacy);
+  };
   const handleLike = async () => {
     try {
       const response = await apiInstance.post('/reaction/like', {
@@ -145,7 +156,41 @@ const PostScreen = (props: Props) => {
       console.error(error);
     }
   };
+  const handleDeletePost = async () => {
+    try {
+      const response = await apiInstance.delete(`/posts/${post_id}`);
+      if (response.data.status_code === 200) {
+        props.navigation.navigate('Profile');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
+  const handleReportPost = async () => {
+    try {
+      const response = await apiInstance.put(`/posts/report/${post_id}`);
+      if (response.data.status_code === 200) {
+        props.navigation.goBack();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const handleUpdatePrivacy = async (privacy: string) => {
+    try {
+      const response = await apiInstance.put(`/posts/privacy/${post_id}`, {
+        privacy: privacy,
+      });
+
+      if (response.data.status_code === 200) {
+        setPrivacy(privacy);
+        toggleModalPrivacy();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <View className="flex-1 flex-col items-start justify-center bg-white">
       <View className="flex flex-row items-center justify-between bg-white w-full p-2 h-20">
@@ -178,16 +223,178 @@ const PostScreen = (props: Props) => {
             </Text>
             <View className="flex flex-row items-center justify-center">
               <DateTime date={time} navigation={props.navigation} />
-              <Image
-                source={require('../../assets/earth.png')}
-                className="w-3 h-3"
-              />
+              <TouchableOpacity
+                onPress={() => toggleModalPrivacy()}
+                className="flex flex-row items-center justify-center gap-2">
+                {privacy === 'public' ? (
+                  <Image
+                    source={require('../../assets/earth.png')}
+                    className="w-3 h-3"
+                  />
+                ) : (
+                  <Image
+                    source={require('../../assets/private.png')}
+                    className="w-3 h-3"
+                  />
+                )}
+              </TouchableOpacity>
             </View>
           </View>
+          <Modal
+            isVisible={isModalVisiblePrivacy}
+            onBackdropPress={toggleModalPrivacy}
+            className="m-1">
+            <View className="w-full  bg-white rounded-lg p-4">
+              <Text className="text-lg font-bold text-start text-black">
+                Ai có thể xem bài viết của bạn?
+              </Text>
+              <Text className="text-xs font-normal text-start text-gray-500 pb-2">
+                Bài viết của bạn có thể hiển thị trên News Feed, trên trang cá
+                nhân và trên các dịch vụ khác trên Travelolo
+              </Text>
+              <Text className="text-xs font-normal text-start text-gray-500 pb-2">
+                Bạn có thể thay đổi ai có thể xem bài viết của bạn bất cứ lúc
+                nào
+              </Text>
+              <Text className="text-lg font-bold text-start text-black pb-2">
+                Chọn đối tượng
+              </Text>
+              <TouchableOpacity
+                onPress={() => handleUpdatePrivacy('public')}
+                className={
+                  privacy === 'public'
+                    ? 'flex flex-row items-center gap-2 bg-gray-200 rounded-lg'
+                    : 'flex flex-row items-center gap-2'
+                }>
+                <Image
+                  source={require('../../assets/earth.png')}
+                  style={{width: 20, height: 20}}
+                />
+                <View className="w-full">
+                  <Text className="text-normal font-bold ">Công khai</Text>
+                  <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                    Mọi người có thể xem bài viết
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleUpdatePrivacy('private')}
+                className={
+                  privacy === 'private'
+                    ? 'flex flex-row items-center gap-2 bg-gray-200 rounded-lg'
+                    : 'flex flex-row items-center gap-2'
+                }>
+                <Image
+                  source={require('../../assets/private.png')}
+                  style={{width: 20, height: 20}}
+                />
+                <View className="w-full">
+                  <Text className="text-normal font-bold ">Riêng tư</Text>
+                  <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                    Chỉ bạn và một số người được chọn có thể xem bài viết
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </Modal>
         </View>
-
+        <Modal
+          isVisible={isModalVisible}
+          onBackdropPress={toggleModal}
+          className="m-1">
+          {store.getState().auth.id === user_id ? (
+            <View className="w-full  bg-white rounded-lg p-4">
+              <Text className="text-lg font-bold text-start text-black">
+                Chỉnh sửa bài viết của bạn
+              </Text>
+              <Text className="text-xs font-normal text-start text-gray-500 pb-2">
+                Bạn có thể chỉnh sửa bài viết của mình bất cứ lúc nào
+              </Text>
+              <Text className="text-xs font-normal text-start text-gray-500 pb-2">
+                Bạn có thể xóa bài viết của mình bất cứ lúc nào
+              </Text>
+              <Text className="text-lg font-bold text-start text-black pb-2">
+                Chọn
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  props.navigation.navigate('EditPost');
+                }}
+                className="flex flex-row items-start gap-2">
+                <Image
+                  source={require('../../assets/edit.png')}
+                  style={{width: 20, height: 20}}
+                />
+                <View className="w-full">
+                  <Text className="text-normal font-bold ">Chỉnh sửa</Text>
+                  <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                    Chỉnh sửa bài viết của bạn
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleDeletePost()}
+                className="flex flex-row items-start gap-2">
+                <Image
+                  source={require('../../assets/delete.png')}
+                  style={{width: 20, height: 20}}
+                />
+                <View className="w-full">
+                  <Text className="text-normal font-bold ">Xóa</Text>
+                  <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                    Xóa bài viết của bạn
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View className="w-full  bg-white rounded-lg p-4">
+              <Text className="text-lg font-bold text-start text-black">
+                Bạn nghĩ gì về bài viết này?
+              </Text>
+              <Text className="text-xs font-normal text-start text-gray-500 pb-2">
+                Bạn có thể báo cáo bài viết nếu bạn thấy nó không phù hợp
+              </Text>
+              <Text className="text-xs font-normal text-start text-gray-500 pb-2">
+                Bạn có thể chọn bài viết tương tự nếu bạn không muốn xem bài
+                viết này
+              </Text>
+              <Text className="text-lg font-bold text-start text-black pb-2">
+                Tùy chọn
+              </Text>
+              <TouchableOpacity
+                onPress={() => handleReportPost()}
+                className="flex flex-row items-center gap-2">
+                <Image
+                  source={require('../../assets/earth.png')}
+                  style={{width: 20, height: 20}}
+                />
+                <View className="w-full">
+                  <Text className="text-normal font-bold ">Báo cáo</Text>
+                  <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2"></Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => props.navigation.navigate('Search')}
+                className="flex flex-row items-center gap-2">
+                <Image
+                  source={require('../../assets/private.png')}
+                  style={{width: 20, height: 20}}
+                />
+                <View className="w-full">
+                  <Text className="text-normal font-bold ">
+                    Bài viết tương tự
+                  </Text>
+                  <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                    Chỉ bạn và một số người được chọn có thể xem bài viết
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
+        </Modal>
         <TouchableOpacity
-          onPress={() => props.navigation.goBack()}
+          onPress={() => toggleModal()}
           className="w-8 h-8 rounded-full flex items-center justify-center">
           <Image
             source={require('../../assets/menu-dot.png')}
@@ -308,7 +515,7 @@ const PostScreen = (props: Props) => {
                       />
                     </TouchableOpacity>
                     <View className="flex flex-col items-start justify-center">
-                      <View className="flex flex-col items-start justify-center p-2 bg-gray-100 rounded-xl">
+                      <View className="flex flex-col items-start justify-center pl-2 pr-2 pb-2 pt-1 bg-gray-100 rounded-xl">
                         <Text className="text-lg font-bold text-start text-black">
                           {item.full_name}
                         </Text>
@@ -316,7 +523,7 @@ const PostScreen = (props: Props) => {
                           {item.content}
                         </Text>
                       </View>
-                      <View className="flex flex-row items-center justify-center pt-1 pl-1">
+                      <View className="flex flex-row items-center justify-center pt-1 pb-1 pl-1">
                         <DateTime
                           date={item.created_at}
                           navigation={item.navigation}
