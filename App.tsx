@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import store from './libs/redux/store';
-import {Text, View} from 'react-native';
 import {Provider} from 'react-redux';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Tabs from './Navigations/Tabs';
@@ -19,6 +18,13 @@ import EditInfoPublic from './modules/screens/EditInfoPublic';
 import SearchScreen from './modules/screens/Search';
 import PostScreen from './modules/screens/Post';
 import NewDestination from './modules/screens/NewDestination';
+import io from 'socket.io-client';
+const socket = io('http://192.168.1.3:5000', {
+  transports: ['websocket'],
+  query: {
+    userId: store.getState().auth.id,
+  },
+});
 
 function App() {
   const isAuthenticated = store.getState().auth.isAuthenticated;
@@ -28,6 +34,24 @@ function App() {
     setTimeout(() => {
       setIsWelcome(false);
     }, 3000);
+  }, []);
+  React.useEffect(() => {
+    // Xử lý sự kiện khi kết nối thành công
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket server');
+    });
+
+    // Xử lý sự kiện khi nhận được thông điệp từ máy chủ
+    socket.on('messageFromServer', data => {
+      console.log('Received message from server:', data);
+    });
+
+    // Xử lý sự kiện khi ngắt kết nối
+    socket.on('disconnect', () => {
+      console.log('Disconnected from WebSocket server');
+    });
+
+    // Thực hiện các xử lý khác tại đây
   }, []);
   const Stack = createNativeStackNavigator();
 

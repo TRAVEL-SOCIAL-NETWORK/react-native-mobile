@@ -206,14 +206,16 @@ const PostScreen = (props: Props) => {
             />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate('Info', {user_id: user_id})
-            }
+            onPress={() => {}}
             className="rounded-full flex items-center justify-center border-2 border-gray-300">
             <Image
-              source={avatar || require('../../assets/avatar.png')}
-              width={10}
-              height={10}
+              source={
+                typeof avatar === 'string'
+                  ? {uri: avatar}
+                  : avatar && typeof avatar === 'object'
+                  ? avatar
+                  : require('../../assets/avatar.png')
+              }
               className="w-10 h-10 rounded-full"
             />
           </TouchableOpacity>

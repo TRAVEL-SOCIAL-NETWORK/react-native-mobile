@@ -1,11 +1,13 @@
 import {Image, Text, TouchableOpacity, View} from 'react-native';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from '../modules/screens/Homepage';
 import Friends from '../modules/screens/Friends';
 import MenuScreen from '../modules/screens/Menu';
 import NotifyScreen from '../modules/screens/Notify';
 import AddressScreen from '../modules/screens/Address';
+import io from 'socket.io-client';
+const socket = io('http://192.168.1.3:5000');
 
 type Props = {
   navigation: any;
@@ -14,6 +16,23 @@ type Props = {
 const Tab = createBottomTabNavigator();
 
 const Tabs = (props: Props) => {
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    socket.on('newComment', data => {
+      console.log('Received new comment notification:', data);
+      setNotificationCount(prevCount => prevCount + 1); // Sử dụng prevState để đảm bảo tính toán đúng khi cập nhật giá trị state
+    });
+
+    return () => {
+      socket.off('newComment');
+    };
+  }, [notificationCount]); // Đưa notificationCount vào dependency array
+
+  const handleNotificationTabPress = () => {
+    setNotificationCount(0);
+    props.navigation.navigate('Notification');
+  };
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -30,7 +49,6 @@ const Tabs = (props: Props) => {
             <TouchableOpacity
               onPress={() => {
                 if (props.navigation.isFocused()) {
-                  // Nếu đang ở trang Home và tab Home được nhấp lại, load lại trang Home
                   props.navigation.navigate('Home', {refresh: true});
                 } else {
                   props.navigation.navigate('Home');
@@ -95,16 +113,41 @@ const Tabs = (props: Props) => {
         options={({route}) => ({
           tabBarIcon: ({focused}) => (
             <View className="flex-col items-center justify-center align-middle">
-              <Image
-                source={require('../assets/notify.png')}
-                style={{
-                  width: 30,
-                  height: 30,
-                  tintColor: focused ? '#0F9AFE' : '#666',
-                }}
-              />
+              {/* Hiển thị số lượng thông báo trên biểu tượng thông báo */}
+              <View style={{position: 'relative'}}>
+                <Image
+                  source={require('../assets/notify.png')}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    tintColor: focused ? '#0F9AFE' : '#666',
+                  }}
+                />
+                {notificationCount > 0 && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: -5,
+                      right: -5,
+                      backgroundColor: 'red',
+                      borderRadius: 10,
+                      paddingHorizontal: 6,
+                      paddingVertical: 2,
+                    }}>
+                    <Text style={{color: '#FFF', fontSize: 12}}>
+                      {notificationCount}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
           ),
+        })}
+        listeners={({navigation}) => ({
+          tabPress: () => {
+            handleNotificationTabPress(); // Xử lý sự kiện khi người dùng truy cập tab thông báo
+            navigation.navigate('Notification');
+          },
         })}
       />
       <Tab.Screen
