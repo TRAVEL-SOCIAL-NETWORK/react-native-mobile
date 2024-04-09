@@ -18,6 +18,7 @@ import WelcomeScreen from './modules/screens/Welcome';
 import EditInfoPublic from './modules/screens/EditInfoPublic';
 import SearchScreen from './modules/screens/Search';
 import PostScreen from './modules/screens/Post';
+import NewDestination from './modules/screens/NewDestination';
 
 function App() {
   const isAuthenticated = store.getState().auth.isAuthenticated;
@@ -58,6 +59,7 @@ function App() {
               <Stack.Screen name="FriendAccept" component={FriendAccept} />
               <Stack.Screen name="Profile" component={Profile} />
               <Stack.Screen name="NewPost" component={NewPost} />
+              <Stack.Screen name="NewDestination" component={NewDestination} />
               <Stack.Screen name="EditPublic" component={EditInfoPublic} />
               <Stack.Screen name="Search" component={SearchScreen} />
               <Stack.Screen name="Post" component={PostScreen} />

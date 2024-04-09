@@ -6,6 +6,7 @@ type Props = {
   destination: string;
   city: string;
   user_id: number;
+  avatar: string;
   time: string;
   description: string;
   like: number;
@@ -33,10 +34,14 @@ const Destination = (props: Props) => {
           </Text>
         </View>
         <TouchableOpacity
-          onPress={() => props.navigation.navigate('Login')}
+          onPress={() => {}}
           className="rounded-lg bg-gray-300 flex items-center justify-center w-full max-h-60 mb-2">
           <Image
-            source={require('../../assets/avatar.png')}
+            source={
+              props.image !== ''
+                ? {uri: props.image}
+                : require('../../assets/image.png')
+            }
             width={24}
             height={24}
             className="w-full h-full rounded-lg"
@@ -72,7 +77,11 @@ const Destination = (props: Props) => {
           <View className="flex-1 flex-row items-center justify-end">
             <DateTime date={props.time} navigation={props.navigation} />
             <Image
-              source={require('../../assets/avatar.png')}
+              source={
+                props.avatar !== ''
+                  ? {uri: props.avatar}
+                  : require('../../assets/avatar.png')
+              }
               width={24}
               height={24}
               className="w-7 h-7 rounded-full"

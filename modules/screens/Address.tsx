@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, Image, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 import apiInstance from '../../configs/apiInstance';
 import Destination from '../views/Destination';
 
@@ -10,6 +17,13 @@ const AddressScreen = (props: Props) => {
   const [data, setData] = useState<any[]>([]);
   const [destination, setDestination] = useState<any[]>([]);
   const [page, setPage] = useState(1);
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchCity();
+    setPage(1);
+    setRefreshing(false);
+  };
 
   useEffect(() => {
     fetchCity();
@@ -26,10 +40,10 @@ const AddressScreen = (props: Props) => {
     }
   };
 
-  // useEffect(() => {
-  //   fetchDestination('65eab8bd0273532a718a12bd');
-  // }, [page]);
-  const fetchDestination = async (city_id: string) => {
+  useEffect(() => {
+    fetchDestination();
+  }, [page]);
+  const fetchDestinationCity = async (city_id: string) => {
     try {
       const response = await apiInstance.get(
         `/travel/destinations/${city_id}`,
@@ -42,7 +56,30 @@ const AddressScreen = (props: Props) => {
       if (response.status !== 200) {
         throw new Error('Error');
       }
-      setDestination(response.data.data);
+      if (page === 1) {
+        setDestination(response.data.data);
+      } else {
+        setDestination([...destination, ...response.data.data]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const fetchDestination = async () => {
+    try {
+      const response = await apiInstance.get(`/travel/destinations`, {
+        params: {
+          page,
+        },
+      });
+      if (response.status !== 200) {
+        throw new Error('Error');
+      }
+      if (page === 1) {
+        setDestination(response.data.data);
+      } else {
+        setDestination([...destination, ...response.data.data]);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -77,17 +114,28 @@ const AddressScreen = (props: Props) => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView onScroll={handleScroll} scrollEventThrottle={400}>
+      <TouchableOpacity
+        className="bg-blue-200 w-16 h-16 rounded-full flex items-center justify-center absolute bottom-5 right-5 z-10"
+        onPress={() => props.navigation.navigate('NewDestination')}>
+        <Image source={require('../../assets/add.png')} className="w-6 h-6" />
+      </TouchableOpacity>
+      <ScrollView
+        onScroll={handleScroll}
+        scrollEventThrottle={10}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         <ScrollView horizontal={true}>
           {data.map((item, index) => {
             return (
               <View
                 className="flex flex-col items-center justify-center mt-1"
-                key={item._id}>
+                key={index}>
                 <TouchableOpacity
                   className="rounded-lg flex flex-col items-center justify-center w-24 bg-white m-1 border-2 border-gray-300"
                   onPress={() => {
-                    fetchDestination(item._id);
+                    setPage(1);
+                    fetchDestinationCity(item._id);
                   }}>
                   <Image
                     source={require('../../assets/avatar.png')}
@@ -104,13 +152,16 @@ const AddressScreen = (props: Props) => {
         {destination.map((item, index) => {
           return (
             <Destination
-              key={item.id}
+              key={index}
               id={item.id}
               destination={item.destination}
               city={item.city}
-              user_id={item.user_id}
+              user_id={item.author.id}
+              avatar={
+                item.author.avatar !== undefined ? item.author.avatar : ''
+              }
               time={item.created_at}
-              description={item.content}
+              description={item.description}
               like={item.likes_count}
               tags={item.tags}
               image={item.image}
