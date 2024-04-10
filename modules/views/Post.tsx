@@ -26,6 +26,7 @@ const Post = (props: Props) => {
   const [cmtCount, setCmtCount] = useState(props.comment);
   const [likeCount, setLikeCount] = useState(props.like);
   const [privacy, setPrivacy] = useState(props.privacy);
+  const [comment, setComment] = useState<string>('');
   const [isModalVisible, setModalVisible] = useState(false);
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -275,9 +276,7 @@ const Post = (props: Props) => {
             {cmtCount} bình luận
           </Text>
         </View>
-        <TouchableOpacity
-          onPress={() => props.navigation.navigate('Login')}
-          className="h-9 flex flex-row items-center justify-start w-full gap-2 mt-2">
+        <View className="h-9 flex flex-row items-center justify-start w-full gap-2 mt-2">
           <Image
             source={
               store.getState().auth.avatar !== ''
@@ -289,15 +288,35 @@ const Post = (props: Props) => {
             className="w-7 h-7 rounded-full"
           />
           <TextInput
-            className="h-full rounded-full flex items-center justify-center w-10/12 pl-2 text-sm"
+            className="h-full rounded-full flex items-center justify-center w-3/4 pl-2 text-sm"
             placeholder="Thêm bình luận..."
+            value={comment}
+            onChangeText={text => {
+              setComment(text);
+            }}
             onSubmitEditing={e => {
               if (e.nativeEvent.text.trim().length > 0) {
                 handleComment(e.nativeEvent.text);
+                setComment('');
               }
             }}
           />
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              if (comment.trim().length > 0) {
+                handleComment(comment);
+                setComment('');
+              }
+            }}
+            className=" flex items-center justify-center">
+            <Image
+              source={require('../../assets/send.png')}
+              width={24}
+              height={24}
+              className="w-7 h-7"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

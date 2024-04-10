@@ -93,7 +93,7 @@ const SearchScreen = (props: Props) => {
           </TouchableOpacity>
           <TextInput
             placeholder="Tìm kiếm trên Travelolo"
-            className="w-5/6 rounded-full bg-gray-300 p-1"
+            className="w-5/6 rounded-full bg-gray-300 pl-4 pt-1 pb-1"
             onSubmitEditing={e => {
               if (e.nativeEvent.text.trim().length > 0) {
                 handleSearch(e.nativeEvent.text);
@@ -119,6 +119,7 @@ const SearchScreen = (props: Props) => {
                 destination={item.destination}
                 city={item.city}
                 user_id={item.user_id}
+                avatar={item.avatar !== undefined ? item.avatar : ''}
                 time={item.created_at}
                 description={item.content}
                 like={item.likes_count}
@@ -177,6 +178,7 @@ const SearchScreen = (props: Props) => {
                 comment={item.comments_count}
                 image={item.image}
                 destination={item.travel_destination}
+                privacy={item.privacy}
                 navigation={props.navigation}
               />
             );

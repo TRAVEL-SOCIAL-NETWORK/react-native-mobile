@@ -596,7 +596,7 @@ const PostScreen = (props: Props) => {
                       })
                     : null}
 
-                  {item.replies_count > 0 ? (
+                  {item.replies_count > 0 && replies.length === 0 ? (
                     <View className="flex flex-row items-start justify-start w-full p-2 ml-16">
                       <TouchableOpacity
                         onPress={() => {
@@ -618,6 +618,19 @@ const PostScreen = (props: Props) => {
                         <Text className="text-xs text-black">đã trả lời</Text>
                         <Text className="text-xs text-black">
                           {item.replies_count} phản hồi
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : item.replies_count > 0 && replies.length > 0 ? (
+                    <View className="flex flex-row items-start justify-start w-full p-2 ml-16">
+                      <TouchableOpacity
+                        onPress={() => {
+                          setCommentId('');
+                          setReplies([]);
+                        }}
+                        className="flex flex-row items-center justify-start gap-1">
+                        <Text className="text-xs text-black font-bold">
+                          Ẩn {item.replies_count} phản hồi
                         </Text>
                       </TouchableOpacity>
                     </View>

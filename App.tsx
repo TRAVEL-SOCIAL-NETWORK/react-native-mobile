@@ -19,7 +19,7 @@ import SearchScreen from './modules/screens/Search';
 import PostScreen from './modules/screens/Post';
 import NewDestination from './modules/screens/NewDestination';
 import io from 'socket.io-client';
-const socket = io('http://192.168.1.3:5000', {
+const socket = io('http://192.168.1.4:5000', {
   transports: ['websocket'],
   query: {
     userId: store.getState().auth.id,

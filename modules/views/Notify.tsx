@@ -16,7 +16,6 @@ type Props = {
 };
 
 const Notify = (props: Props) => {
-  const [post, setPost] = React.useState<any>({});
   const [seen, setSeen] = React.useState<boolean>(props.seen);
 
   const fetchPost = async () => {
@@ -31,7 +30,6 @@ const Notify = (props: Props) => {
         throw new Error('Error');
       }
       const post = await response.data.data;
-      setPost(response.data.data);
       await props.navigation.navigate('Post', {
         post_id: post._id,
         name: post.full_name,
@@ -81,10 +79,10 @@ const Notify = (props: Props) => {
           <Text className="text-lg font-bold text-start text-black">
             {props.name}{' '}
             <Text className="text-sm text-start text-black font-normal">
-              đã bình luận về một địa đải du lịch trong bài viết:{' '}
+              đã bình luận về một địa điểm du lịch trong bài viết:{' '}
               <Text className="text-sm text-start text-black font-bold">
-                {props.content.length > 40
-                  ? props.content.slice(0, 40) + '...'
+                {props.content.length > 47
+                  ? props.content.slice(0, 47) + '...'
                   : props.content}
               </Text>
             </Text>

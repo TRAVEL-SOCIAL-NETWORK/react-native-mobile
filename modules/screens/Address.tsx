@@ -138,7 +138,11 @@ const AddressScreen = (props: Props) => {
                     fetchDestinationCity(item._id);
                   }}>
                   <Image
-                    source={require('../../assets/avatar.png')}
+                    source={
+                      item.avatar !== undefined
+                        ? {uri: item.avatar}
+                        : require('../../assets/avatar.png')
+                    }
                     className="w-10 h-10 rounded-full mt-2"
                   />
                   <Text className="text-center m-2 font-semibold">

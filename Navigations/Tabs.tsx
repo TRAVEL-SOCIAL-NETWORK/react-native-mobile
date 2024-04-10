@@ -7,7 +7,8 @@ import MenuScreen from '../modules/screens/Menu';
 import NotifyScreen from '../modules/screens/Notify';
 import AddressScreen from '../modules/screens/Address';
 import io from 'socket.io-client';
-const socket = io('http://192.168.1.3:5000');
+import store from '../libs/redux/store';
+const socket = io('http://192.168.1.4:5000');
 
 type Props = {
   navigation: any;
@@ -21,7 +22,8 @@ const Tabs = (props: Props) => {
   useEffect(() => {
     socket.on('newComment', data => {
       console.log('Received new comment notification:', data);
-      setNotificationCount(prevCount => prevCount + 1); // Sử dụng prevState để đảm bảo tính toán đúng khi cập nhật giá trị state
+      if (data.authorPost === store.getState().auth.id)
+        setNotificationCount(prevCount => prevCount + 1); // Sử dụng prevState để đảm bảo tính toán đúng khi cập nhật giá trị state
     });
 
     return () => {
