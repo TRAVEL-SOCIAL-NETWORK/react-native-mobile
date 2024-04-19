@@ -16,13 +16,14 @@ type Props = {
 };
 
 const HomeScreen = (props: Props) => {
-  const {avatar, first_name} = store.getState().auth;
+  const {avatar, last_name} = store.getState().auth;
   const [data, setData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
     setRefreshing(true);
     setPage(1);
+    fetchData();
     setRefreshing(false);
   };
   useEffect(() => {
@@ -77,7 +78,7 @@ const HomeScreen = (props: Props) => {
             />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => props.navigation.navigate('Search')}
+            onPress={() => props.navigation.navigate('Search', {name: ''})}
             className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
             <Image
               source={require('../../assets/search.png')}
@@ -121,7 +122,7 @@ const HomeScreen = (props: Props) => {
             <TouchableOpacity
               onPress={() => props.navigation.navigate('NewPost')}>
               <Text className="text-center m-4 font-semibold">
-                Chia sẻ chuyến du lịch của {first_name}?
+                Chia sẻ chuyến du lịch của {last_name}?
               </Text>
             </TouchableOpacity>
           </View>

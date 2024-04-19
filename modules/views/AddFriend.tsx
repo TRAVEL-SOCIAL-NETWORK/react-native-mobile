@@ -1,8 +1,9 @@
 import React from 'react';
 import {Image, Text, TouchableOpacity, View} from 'react-native';
 import apiInstance from '../../configs/apiInstance';
+import store from '../../libs/redux/store';
 type Props = {
-  id: number;
+  id: string;
   name: string;
   avatar: string;
   navigation: any;
@@ -52,7 +53,13 @@ const AddFriend = (props: Props) => {
   return (
     <View className="flex-1 flex-row items-center justify-around bg-white pb-2 gap-2">
       <TouchableOpacity
-        onPress={() => props.navigation.navigate('Login')}
+        onPress={() => {
+          if (props.id === store.getState().auth.id) {
+            props.navigation.navigate('Profile', {user_id: props.id});
+          } else {
+            props.navigation.navigate('ProfileUser', {user_id: props.id});
+          }
+        }}
         className="rounded-full flex items-center justify-center border-2 border-gray-300">
         <Image
           source={

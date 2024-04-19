@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import DateTime from './DateTime';
 import store from '../../libs/redux/store';
@@ -32,6 +32,12 @@ const Post = (props: Props) => {
     setModalVisible(!isModalVisible);
   };
 
+  useEffect(() => {
+    setIsLiked(props.isLike);
+    setCmtCount(props.comment);
+    setLikeCount(props.like);
+    setPrivacy(props.privacy);
+  }, [props.isLike, props.comment, props.like, props.privacy]);
   const handleLike = async () => {
     try {
       const response = await apiInstance.post('/reaction/like', {
@@ -90,7 +96,13 @@ const Post = (props: Props) => {
   return (
     <View className="flex-1 flex-row items-start justify-around bg-white gap-2 mt-1.5 pb-2 pl-2">
       <TouchableOpacity
-        onPress={() => props.navigation.navigate('Login')}
+        onPress={() => {
+          if (props.user_id === store.getState().auth.id) {
+            props.navigation.navigate('Profile', {user_id: props.user_id});
+          } else {
+            props.navigation.navigate('ProfileUser', {user_id: props.user_id});
+          }
+        }}
         className="rounded-full flex items-center justify-center ml-2 border-2 border-gray-300">
         <Image
           source={props.avatar || require('../../assets/avatar.png')}
@@ -109,9 +121,16 @@ const Post = (props: Props) => {
             <TouchableOpacity
               onPress={() => toggleModal()}
               className="rounded-full flex items-center justify-center">
-              {privacy === 'public' ? null : (
+              {privacy === 'public' ? null : privacy === 'private' ? (
                 <Image
                   source={require('../../assets/private.png')}
+                  width={24}
+                  height={24}
+                  className="w-3 h-3"
+                />
+              ) : (
+                <Image
+                  source={require('../../assets/friend.png')}
                   width={24}
                   height={24}
                   className="w-3 h-3"
@@ -169,12 +188,27 @@ const Post = (props: Props) => {
                     </Text>
                   </View>
                 </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleUpdatePrivacy('friend')}
+                  className={
+                    privacy === 'friend'
+                      ? 'flex flex-row items-center gap-2 bg-gray-200 rounded-lg'
+                      : 'flex flex-row items-center gap-2'
+                  }>
+                  <Image
+                    source={require('../../assets/friend.png')}
+                    style={{width: 20, height: 20}}
+                  />
+                  <View className="w-full">
+                    <Text className="text-normal font-bold "> Bạn bè</Text>
+                    <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                      Chỉ bạn bè có thể xem bài viết
+                    </Text>
+                  </View>
+                </TouchableOpacity>
               </View>
             </Modal>
           </View>
-        </View>
-        <View className="flex-1 flex-row items-center justify-between gap-2">
-          <Text className="text-sm text-start text-black">{props.status}</Text>
         </View>
         <TouchableOpacity
           onPress={() =>
@@ -193,7 +227,8 @@ const Post = (props: Props) => {
               destination: props.destination,
             })
           }
-          className="rounded-lg bg-gray-300 flex items-center justify-center w-full h-40 mb-2">
+          className="rounded-lg flex items-start justify-center w-full mb-2 gap-1">
+          <Text className="text-sm text-start text-black">{props.status}</Text>
           <Image
             source={
               props.image !== ''
@@ -228,7 +263,22 @@ const Post = (props: Props) => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => props.navigation.navigate('Login')}
+              onPress={() => {
+                props.navigation.navigate('Post', {
+                  post_id: props.id,
+                  name: props.name,
+                  avatar: props.avatar,
+                  user_id: props.user_id,
+                  time: props.time,
+                  content: props.status,
+                  like: likeCount,
+                  isLike: isLiked,
+                  comment: cmtCount,
+                  image: props.image,
+                  privacy: props.privacy,
+                  destination: props.destination,
+                });
+              }}
               className="w-8 h-8 flex items-center justify-center">
               <Image
                 source={require('../../assets/comment.png')}
@@ -239,7 +289,7 @@ const Post = (props: Props) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => props.navigation.navigate('Login')}
+              onPress={() => {}}
               className="w-8 h-8 flex items-center justify-center">
               <Image
                 source={require('../../assets/share.png')}
@@ -252,7 +302,7 @@ const Post = (props: Props) => {
 
           <View className="flex flex-row items-center justify-center">
             <TouchableOpacity
-              onPress={() => props.navigation.navigate('Login')}
+              onPress={() => {}}
               className="w-8 h-8 flex items-center justify-center">
               <Image
                 source={require('../../assets/address.png')}
@@ -260,7 +310,9 @@ const Post = (props: Props) => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => props.navigation.navigate('Login')}
+              onPress={() => {
+                props.navigation.navigate('Search', {name: props.destination});
+              }}
               className="h-8 flex items-end justify-center">
               <Text className="text-sm text-black font-bold text-end">
                 {props.destination}

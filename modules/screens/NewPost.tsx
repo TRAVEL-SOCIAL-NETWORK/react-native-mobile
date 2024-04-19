@@ -201,7 +201,9 @@ const NewPost = (props: Props) => {
                         ? require('../../assets/earth.png')
                         : privacy === 'private'
                         ? require('../../assets/private.png')
-                        : require('../../assets/friend.png')
+                        : privacy === 'friend'
+                        ? require('../../assets/friend.png')
+                        : null
                     }
                     style={{width: 15, height: 15, tintColor: '#4299e1'}}
                   />
@@ -210,7 +212,9 @@ const NewPost = (props: Props) => {
                       ? 'Công khai'
                       : privacy === 'private'
                       ? 'Riêng tư'
-                      : 'Bạn bè'}
+                      : privacy === 'friend'
+                      ? 'Bạn bè'
+                      : 'Chọn đối tượng'}
                   </Text>
                   <Image
                     source={require('../../assets/down.png')}
@@ -278,6 +282,20 @@ const NewPost = (props: Props) => {
                     <Text className="text-normal font-bold ">Riêng tư</Text>
                     <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
                       Chỉ bạn và một số người được chọn có thể xem bài viết
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handlePrivacySelection('friend')}
+                  className="flex flex-row items-center gap-2">
+                  <Image
+                    source={require('../../assets/friend.png')}
+                    style={{width: 20, height: 20}}
+                  />
+                  <View className="w-full">
+                    <Text className="text-normal font-bold ">Bạn bè</Text>
+                    <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                      Chỉ bạn bè có thể xem bài viết
                     </Text>
                   </View>
                 </TouchableOpacity>

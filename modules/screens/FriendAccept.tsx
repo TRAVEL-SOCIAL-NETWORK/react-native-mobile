@@ -42,7 +42,7 @@ const FriendAccept = (props: Props) => {
         </Text>
         <View>
           <TouchableOpacity
-            onPress={() => props.navigation.navigate('Login')}
+            onPress={() => props.navigation.navigate('Search', {name: ''})}
             className="w-8 h-8 rounded-full flex items-center justify-center m-4">
             <Image
               source={require('../../assets/search.png')}

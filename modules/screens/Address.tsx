@@ -22,6 +22,7 @@ const AddressScreen = (props: Props) => {
     setRefreshing(true);
     fetchCity();
     setPage(1);
+    fetchDestination();
     setRefreshing(false);
   };
 
@@ -103,7 +104,7 @@ const AddressScreen = (props: Props) => {
         </View>
         <View>
           <TouchableOpacity
-            onPress={() => props.navigation.navigate('Login')}
+            onPress={() => props.navigation.navigate('Search', {name: ''})}
             className="w-8 h-8 rounded-full flex items-center justify-center mr-4">
             <Image
               source={require('../../assets/search.png')}
@@ -158,17 +159,17 @@ const AddressScreen = (props: Props) => {
             <Destination
               key={index}
               id={item.id}
-              destination={item.destination}
-              city={item.city}
-              user_id={item.author.id}
-              avatar={
-                item.author.avatar !== undefined ? item.author.avatar : ''
-              }
-              time={item.created_at}
+              destination={item.travel_destination}
               description={item.description}
-              like={item.likes_count}
-              tags={item.tags}
+              city={item.city}
+              city_id={item.city_id}
               image={item.image}
+              time={item.created_at}
+              like={item.likes_count}
+              isLiked={item.is_liked}
+              tags={item.tags_count}
+              user_id={item.user_id}
+              avatar={item.avatar !== undefined ? item.avatar : ''}
               navigation={props.navigation}
             />
           );

@@ -11,21 +11,24 @@ import store from '../../libs/redux/store';
 import Post from '../views/Post';
 import apiInstance from '../../configs/apiInstance';
 import Modal from 'react-native-modal';
+import {RouteProp} from '@react-navigation/native';
+
+type RootStackParamList = {
+  User: {
+    user_id: string;
+  };
+};
+
+type ScreenBRouteProp = RouteProp<RootStackParamList, 'User'>;
 
 type Props = {
   navigation: any;
+  route: ScreenBRouteProp;
 };
-const Profile = (props: Props) => {
-  const fullname =
-    store.getState().auth.last_name + ' ' + store.getState().auth.first_name;
-  const avatar =
-    store.getState().auth.avatar !== null ? store.getState().auth.avatar : '';
+const ProfileUser = (props: Props) => {
   const [tabPost, setTabPost] = useState<boolean>(true);
   const [profile, setProfile] = useState<any>({});
   const [friends, setFriends] = useState<any[]>([]);
-  const [privacy, setPrivacy] = useState<string>('');
-  const [oldest, setOldest] = useState<boolean>(false);
-  const [isModalVisible, setModalVisible] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = () => {
@@ -35,16 +38,15 @@ const Profile = (props: Props) => {
     fetchProfile();
     setRefreshing(false);
   };
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
 
   useEffect(() => {
     fetchProfile();
   }, []);
   const fetchProfile = async () => {
     try {
-      const response = await apiInstance.get('/user/profile');
+      const response = await apiInstance.get(
+        `/user/profile/${props.route.params.user_id}`,
+      );
       if (response.status !== 200) {
         throw new Error('Error');
       }
@@ -59,17 +61,18 @@ const Profile = (props: Props) => {
   const [page, setPage] = useState(1);
   useEffect(() => {
     fetchData();
-  }, [page, privacy, oldest]);
+  }, [page]);
 
   const fetchData = async () => {
     try {
-      const response = await apiInstance.get(`/posts/user`, {
-        params: {
-          page,
-          privacy,
-          oldest,
+      const response = await apiInstance.get(
+        `/posts/user/${props.route.params.user_id}`,
+        {
+          params: {
+            page,
+          },
         },
-      });
+      );
       console.log('loadingpost');
       if (page === 1) {
         setData(response.data.data);
@@ -90,111 +93,53 @@ const Profile = (props: Props) => {
     }
   };
 
+  const handleRequest = async () => {
+    try {
+      const response = await apiInstance.post(
+        '/friendship/request-friendship',
+        {
+          to: props.route.params.user_id,
+        },
+      );
+      if (response.status !== 200) {
+        throw new Error('Error');
+      }
+      fetchData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleAccept = async () => {
+    try {
+      const response = await apiInstance.post('/friendship/accept-friendship', {
+        from: store.getState().auth.id,
+      });
+      if (response.status !== 200) {
+        throw new Error('Error');
+      }
+      fetchData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await apiInstance.post('/friendship/reject-friendship', {
+        from: store.getState().auth.id,
+      });
+      if (response.status !== 200) {
+        throw new Error('Error');
+      }
+      fetchData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <View className="h-full bg-blue-50">
-      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
-        <View className="w-full  bg-white rounded-lg p-4">
-          <Text className="text-lg font-bold text-start text-black">
-            Bộ lọc bài viết
-          </Text>
-          <Text className="text-xs font-normal text-start text-gray-500 pb-2">
-            Bài viết của bạn có thể hiển thị cho mọi người hoặc chỉ một số người
-          </Text>
-          <Text className="text-xs font-normal text-start text-gray-500 pb-2">
-            Bạn có thể chọn bộ lọc để xem bài viết của mình
-          </Text>
-          <Text className="text-lg font-bold text-start text-black pb-2">
-            Chọn quyền riêng tư
-          </Text>
-          <TouchableOpacity
-            onPress={() => {
-              setPrivacy('public');
-              setModalVisible(false);
-            }}
-            className={
-              privacy === 'public'
-                ? 'flex flex-row items-center gap-2 bg-gray-200 border-2 border-gray-200 rounded-lg'
-                : 'flex flex-row items-center gap-2'
-            }>
-            <Image
-              source={require('../../assets/earth.png')}
-              style={{width: 20, height: 20}}
-            />
-            <View className="w-full">
-              <Text className="text-normal font-bold ">Công khai</Text>
-              <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
-                Mọi người có thể xem bài viết
-              </Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setPrivacy('private');
-              setModalVisible(false);
-            }}
-            className={
-              privacy === 'private'
-                ? 'flex flex-row items-center gap-2 bg-gray-200 border-2 border-gray-200 rounded-lg'
-                : 'flex flex-row items-center gap-2'
-            }>
-            <Image
-              source={require('../../assets/private.png')}
-              style={{width: 20, height: 20}}
-            />
-            <View className="w-full">
-              <Text className="text-normal font-bold ">Riêng tư</Text>
-              <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
-                Chỉ bạn và một số người được chọn có thể xem bài viết
-              </Text>
-            </View>
-          </TouchableOpacity>
-          <Text className="text-lg font-bold text-start text-black pb-2">
-            Sắp xếp
-          </Text>
-          <TouchableOpacity
-            onPress={() => {
-              setOldest(false);
-              setModalVisible(false);
-            }}
-            className={
-              oldest === false
-                ? 'flex flex-row items-center gap-2 bg-gray-200 border-2 border-gray-200 rounded-lg'
-                : 'flex flex-row items-center gap-2'
-            }>
-            <Image
-              source={require('../../assets/time.png')}
-              style={{width: 20, height: 20}}
-            />
-            <View className="w-full">
-              <Text className="text-normal font-bold ">Mới nhất</Text>
-              <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
-                Bài viết mới nhất sẽ hiển thị đầu tiên
-              </Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setOldest(true);
-              setModalVisible(false);
-            }}
-            className={
-              oldest === true
-                ? 'flex flex-row items-center gap-2 bg-gray-200 border-2 border-gray-200 rounded-lg'
-                : 'flex flex-row items-center gap-2'
-            }>
-            <Image
-              source={require('../../assets/time.png')}
-              style={{width: 20, height: 20}}
-            />
-            <View className="w-full">
-              <Text className="text-normal font-bold ">Cũ nhất</Text>
-              <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
-                Bài viết cũ nhất sẽ hiển thị đầu tiên
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </Modal>
       <View className="flex flex-row items-center justify-between bg-white pr-4 pl-2">
         <TouchableOpacity
           onPress={() => props.navigation.goBack()}
@@ -207,27 +152,8 @@ const Profile = (props: Props) => {
         <View className="flex flex-row items-center justify-center gap-4">
           <TouchableOpacity
             onPress={() =>
-              props.navigation.navigate('EditPublic', {
-                work: profile.work,
-                study: profile.study,
-                hobby: profile.hobby,
-                location: profile.location,
-                hometown: profile.hometown,
-                avatar: avatar,
-                background:
-                  profile.background !== undefined ? profile.background : '',
-              })
+              props.navigation.navigate('Search', {name: profile.full_name})
             }
-            className="w-8 h-8 rounded-full flex items-center justify-center">
-            <Image
-              source={require('../../assets/edit.png')}
-              width={24}
-              height={24}
-              className="w-5 h-5"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => props.navigation.navigate('Login')}
             className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-300">
             <Image
               source={require('../../assets/search.png')}
@@ -260,8 +186,8 @@ const Profile = (props: Props) => {
             onPress={() => props.navigation.navigate('FindAccount')}>
             <Image
               source={
-                avatar !== ''
-                  ? {uri: avatar}
+                profile.avatar !== undefined
+                  ? {uri: profile.avatar}
                   : require('../../assets/avatar.png')
               }
               className="w-40 h-40 rounded-full"
@@ -269,7 +195,9 @@ const Profile = (props: Props) => {
           </TouchableOpacity>
         </View>
         <View className="flex flex-col items-center justify-center pt-32">
-          <Text className="text-center font-bold text-xl">{fullname}</Text>
+          <Text className="text-center font-bold text-xl">
+            {profile.full_name}
+          </Text>
           <Text className="text-center font-normal">
             {profile.friends_count} bạn bè
           </Text>
@@ -277,28 +205,33 @@ const Profile = (props: Props) => {
         <View className="flex flex-col items-center justify-center pt-2 gap-2 pl-4 pr-4">
           <TouchableOpacity
             className="flex items-center justify-center bg-blue-500 rounded-lg p-3 w-full"
-            onPress={() => props.navigation.navigate('NewPost')}>
+            onPress={() => {
+              if (profile.is_friend === 'accepted') {
+                handleDelete();
+              } else if (profile.is_friend === 'pending') {
+                handleAccept();
+              } else {
+                handleRequest();
+              }
+            }}>
             <Text className="text-center font-semibold text-white">
-              + Thêm bài viết
+              {profile.is_friend === 'accepted'
+                ? 'Hiện đang là bạn bè'
+                : profile.is_friend === 'pending'
+                ? 'Đang chờ xác nhận'
+                : '+ Thêm bạn bè'}
             </Text>
           </TouchableOpacity>
           <View className="flex flex-row items-center justify-between pt-2 w-full">
             <TouchableOpacity
               className="flex items-center justify-center bg-gray-300 rounded-lg p-3 w-5/6"
               onPress={() =>
-                props.navigation.navigate('EditPublic', {
-                  work: profile.work,
-                  study: profile.study,
-                  hobby: profile.hobby,
-                  location: profile.location,
-                  hometown: profile.hometown,
-                  avatar: avatar,
-                  background:
-                    profile.background !== undefined ? profile.background : '',
+                props.navigation.navigate('Report', {
+                  user_id: props.route.params.user_id,
                 })
               }>
               <Text className="text-center font-semibold text-black">
-                Chỉnh sửa trang cá nhân
+                Báo cáo người dùng
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -395,7 +328,7 @@ const Profile = (props: Props) => {
                 </Text>
               </View>
             )}
-            <View className="flex flex-row items-center justify-start gap-2 w-full">
+            <View className="flex flex-row items-center justify-start gap-2 w-full pb-4 border-b-2 border-gray-200">
               <Image
                 source={require('../../assets/time.png')}
                 className="w-5 h-5 opacity-50"
@@ -403,25 +336,6 @@ const Profile = (props: Props) => {
               <Text className="text-base font-normal text-center text-black">
                 Tham gia vào {new Date(profile.joined_at).toLocaleDateString()}
               </Text>
-            </View>
-            <View className="flex flex-row items-center justify-start pt-2 pb-2 border-b-2 border-gray-200">
-              <TouchableOpacity
-                className="flex items-center justify-center bg-blue-200 rounded-lg p-3 w-full"
-                onPress={() =>
-                  props.navigation.navigate('EditPublic', {
-                    work: profile.work,
-                    study: profile.study,
-                    hobby: profile.hobby,
-                    location: profile.location,
-                    hometown: profile.hometown,
-                    avatar: avatar,
-                    background: profile.background,
-                  })
-                }>
-                <Text className="text-center font-semibold text-blue-500">
-                  Chỉnh sửa chi tiết công khai
-                </Text>
-              </TouchableOpacity>
             </View>
 
             <View className="flex flex-row items-start justify-between w-full mb-2 mt-2">
@@ -447,13 +361,16 @@ const Profile = (props: Props) => {
                   return (
                     <TouchableOpacity
                       onPress={() => {
-                        if (item.user_id === store.getState().auth.id) {
+                        if (
+                          props.route.params.user_id ===
+                          store.getState().auth.id
+                        ) {
                           props.navigation.navigate('Profile', {
-                            user_id: item.id,
+                            user_id: props.route.params.user_id,
                           });
                         } else {
                           props.navigation.navigate('ProfileUser', {
-                            user_id: item.id,
+                            user_id: props.route.params.user_id,
                           });
                         }
                       }}
@@ -488,54 +405,11 @@ const Profile = (props: Props) => {
             <View className="flex flex-row items-start justify-between w-full mb-2 mt-2">
               <View className="flex flex-col items-center justify-start ">
                 <Text className="text-lg font-bold text-center text-black">
-                  Bài viết của bạn
+                  Bài viết của {profile.full_name}
                 </Text>
               </View>
-              <TouchableOpacity
-                className="flex flex-row items-center justify-center gap-2 pr-2"
-                onPress={() => {
-                  setModalVisible(true);
-                }}>
-                <Text className="text-m font-bold text-center text-blue-400">
-                  Bộ lọc
-                </Text>
-              </TouchableOpacity>
             </View>
-            <View className="flex flex-row items-center justify-between bg-white border-b-8 border-gray-200 w-full">
-              <View className="flex flex-row items-center justify-center">
-                <TouchableOpacity
-                  className="border-gray-500 rounded-full border-2 border-gray-300 ml-2 mb-2"
-                  onPress={() => props.navigation.navigate('NewPost')}>
-                  <Image
-                    source={
-                      store.getState().auth.avatar !== ''
-                        ? {uri: store.getState().auth.avatar}
-                        : require('../../assets/avatar.png')
-                    }
-                    className="w-12 h-12 rounded-full"
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => props.navigation.navigate('NewPost')}>
-                  <Text className="text-center m-4 font-semibold">
-                    Chia sẻ chuyến du lịch của{' '}
-                    {store.getState().auth.first_name}?
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View className="flex flex-row items-center justify-center">
-                <TouchableOpacity
-                  onPress={() => props.navigation.navigate('Login')}
-                  className="w-8 h-8 rounded-full flex items-center justify-center">
-                  <Image
-                    source={require('../../assets/image.png')}
-                    width={24}
-                    height={24}
-                    className="w-6 h-6"
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+
             {data.map((item, index) => (
               <Post
                 key={item._id}
@@ -561,4 +435,4 @@ const Profile = (props: Props) => {
   );
 };
 
-export default Profile;
+export default ProfileUser;

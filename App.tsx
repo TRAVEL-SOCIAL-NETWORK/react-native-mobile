@@ -19,7 +19,8 @@ import SearchScreen from './modules/screens/Search';
 import PostScreen from './modules/screens/Post';
 import NewDestination from './modules/screens/NewDestination';
 import io from 'socket.io-client';
-const socket = io('http://192.168.1.4:5000', {
+import ProfileUser from './modules/screens/ProfileUser';
+const socket = io('http://172.20.10.2:5000', {
   transports: ['websocket'],
   query: {
     userId: store.getState().auth.id,
@@ -87,6 +88,7 @@ function App() {
               <Stack.Screen name="EditPublic" component={EditInfoPublic} />
               <Stack.Screen name="Search" component={SearchScreen} />
               <Stack.Screen name="Post" component={PostScreen} />
+              <Stack.Screen name="ProfileUser" component={ProfileUser} />
             </>
           )}
         </Stack.Navigator>

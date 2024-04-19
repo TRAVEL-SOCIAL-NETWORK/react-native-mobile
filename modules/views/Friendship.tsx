@@ -2,8 +2,9 @@ import React from 'react';
 import {Image, Text, TouchableOpacity, View} from 'react-native';
 import apiInstance from '../../configs/apiInstance';
 import DateTime from './DateTime';
+import store from '../../libs/redux/store';
 type Props = {
-  id: number;
+  id: string;
   name: string;
   avatar: string;
   time: string;
@@ -39,7 +40,13 @@ const Friendship = (props: Props) => {
   return (
     <View className="flex-1 flex-row items-center justify-around bg-white pb-2 gap-2">
       <TouchableOpacity
-        onPress={() => props.navigation.navigate('Login')}
+        onPress={() => {
+          if (props.id === store.getState().auth.id) {
+            props.navigation.navigate('Profile', {user_id: props.id});
+          } else {
+            props.navigation.navigate('ProfileUser', {user_id: props.id});
+          }
+        }}
         className="rounded-full flex items-center justify-center border-2 border-gray-300">
         <Image
           source={
@@ -64,19 +71,37 @@ const Friendship = (props: Props) => {
         <View className="flex-1 flex-row items-center justify-between gap-2">
           {isFriend ? null : (
             <TouchableOpacity
-              className="bg-blue-500 flex-1 rounded-lg"
+              className={
+                isRequest
+                  ? 'bg-blue-200 flex-1 rounded-lg'
+                  : 'bg-blue-500 flex-1 rounded-lg'
+              }
               onPress={() => {
                 handleRequest();
               }}>
-              <Text className="text-base font-medium m-2 text-white text-center">
-                {props.request ? 'Xác nhận' : 'Thêm bạn bè'}
+              <Text
+                className={
+                  isRequest
+                    ? 'text-base font-medium m-2 color-blue-400 text-center'
+                    : 'text-base font-medium m-2 text-white text-center'
+                }>
+                {props.request
+                  ? 'Xác nhận'
+                  : isRequest
+                  ? 'Đã gửi yêu cầu'
+                  : 'Thêm bạn bè'}
               </Text>
             </TouchableOpacity>
           )}
           <TouchableOpacity
             className="bg-gray-200 flex-1 rounded-lg"
             onPress={() => props.navigation.navigate('FindAccount')}>
-            <Text className="text-base font-medium m-2 text-black text-center">
+            <Text
+              className={
+                isFriend
+                  ? 'text-base font-medium m-2 color-blue-400 text-center'
+                  : 'text-base font-medium m-2 text-black text-center'
+              }>
               {isFriend ? 'Chúng ta đã là bạn bè' : 'Xoá'}
             </Text>
           </TouchableOpacity>

@@ -226,19 +226,27 @@ const PostScreen = (props: Props) => {
             <View className="flex flex-row items-center justify-center">
               <DateTime date={time} navigation={props.navigation} />
               <TouchableOpacity
-                onPress={() => toggleModalPrivacy()}
+                onPress={() => {
+                  if (store.getState().auth.id === user_id)
+                    toggleModalPrivacy();
+                }}
                 className="flex flex-row items-center justify-center gap-2">
                 {privacy === 'public' ? (
                   <Image
                     source={require('../../assets/earth.png')}
                     className="w-3 h-3"
                   />
-                ) : (
+                ) : privacy === 'private' ? (
                   <Image
                     source={require('../../assets/private.png')}
                     className="w-3 h-3"
                   />
-                )}
+                ) : privacy === 'friend' ? (
+                  <Image
+                    source={require('../../assets/friend.png')}
+                    className="w-3 h-3"
+                  />
+                ) : null}
               </TouchableOpacity>
             </View>
           </View>
@@ -294,6 +302,24 @@ const PostScreen = (props: Props) => {
                   <Text className="text-normal font-bold ">Riêng tư</Text>
                   <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
                     Chỉ bạn và một số người được chọn có thể xem bài viết
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleUpdatePrivacy('friend')}
+                className={
+                  privacy === 'friend'
+                    ? 'flex flex-row items-center gap-2 bg-gray-200 rounded-lg'
+                    : 'flex flex-row items-center gap-2'
+                }>
+                <Image
+                  source={require('../../assets/friend.png')}
+                  style={{width: 20, height: 20}}
+                />
+                <View className="w-full">
+                  <Text className="text-normal font-bold "> Bạn bè</Text>
+                  <Text className="text-xs font-normal border-b-2 border-gray-200 w-5/6 pb-2">
+                    Chỉ bạn bè có thể xem bài viết
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -447,7 +473,7 @@ const PostScreen = (props: Props) => {
                 />
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => props.navigation.navigate('Login')}
+                onPress={() => {}}
                 className="w-8 h-8 flex items-center justify-center">
                 <Image
                   source={require('../../assets/comment.png')}
@@ -458,7 +484,7 @@ const PostScreen = (props: Props) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => props.navigation.navigate('Login')}
+                onPress={() => {}}
                 className="w-8 h-8 flex items-center justify-center">
                 <Image
                   source={require('../../assets/share.png')}
@@ -471,7 +497,9 @@ const PostScreen = (props: Props) => {
 
             <View className="flex flex-row items-center justify-center">
               <TouchableOpacity
-                onPress={() => props.navigation.navigate('Login')}
+                onPress={() => {
+                  props.navigation.navigate('Search', {name: destination});
+                }}
                 className="w-8 h-8 flex items-center justify-center">
                 <Image
                   source={require('../../assets/address.png')}
@@ -479,7 +507,9 @@ const PostScreen = (props: Props) => {
                 />
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => props.navigation.navigate('Login')}
+                onPress={() => {
+                  props.navigation.navigate('Search', {name: destination});
+                }}
                 className="h-8 flex items-end justify-center">
                 <Text className="text-sm text-black font-bold text-end">
                   {destination}
@@ -503,7 +533,17 @@ const PostScreen = (props: Props) => {
                   className="flex flex-col items-center justify-between bg-white w-full">
                   <View className="flex flex-row items-start justify-start gap-2  w-full">
                     <TouchableOpacity
-                      onPress={() => {}}
+                      onPress={() => {
+                        if (item.user_id === store.getState().auth.id) {
+                          props.navigation.navigate('Profile', {
+                            user_id: item.user_id,
+                          });
+                        } else {
+                          props.navigation.navigate('ProfileUser', {
+                            user_id: item.user_id,
+                          });
+                        }
+                      }}
                       className="rounded-full flex items-center justify-center  border-2 border-gray-300">
                       <Image
                         source={

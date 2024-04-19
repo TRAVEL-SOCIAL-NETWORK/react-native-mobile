@@ -48,7 +48,7 @@ const Friends = (props: Props) => {
         </View>
         <View>
           <TouchableOpacity
-            onPress={() => props.navigation.navigate('Search')}
+            onPress={() => props.navigation.navigate('Search', {name: ''})}
             className="w-8 h-8 rounded-full flex items-center justify-center m-4">
             <Image
               source={require('../../assets/search.png')}
@@ -64,7 +64,7 @@ const Friends = (props: Props) => {
           <View className="flex flex-row items-center justify-center gap-4 mb-4">
             <TouchableOpacity
               className="w-20 h-10 border-gray-500 rounded-full bg-gray-300 flex items-center justify-center"
-              onPress={() => props.navigation.navigate('FindAccount')}>
+              onPress={() => {}}>
               <Text className="text-xs font-bold text-center text-black">
                 Gợi ý
               </Text>
@@ -86,7 +86,7 @@ const Friends = (props: Props) => {
           </View>
           <TouchableOpacity
             className="flex flex-row items-center justify-center gap-4 mb-2"
-            onPress={() => props.navigation.navigate('FindAccount')}>
+            onPress={() => {}}>
             <Text className="text-m font-bold text-center text-blue-400">
               Xem tất cả
             </Text>

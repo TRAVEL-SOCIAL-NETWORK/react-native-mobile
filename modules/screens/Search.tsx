@@ -12,16 +12,31 @@ import apiInstance from '../../configs/apiInstance';
 import Destination from '../views/Destination';
 import AddFriend from '../views/AddFriend';
 import Post from '../views/Post';
+import {RouteProp} from '@react-navigation/native';
 
+type RootStackParamList = {
+  Search: {
+    name: string;
+  };
+};
+
+type ScreenBRouteProp = RouteProp<RootStackParamList, 'Search'>;
 type Props = {
   navigation: any;
+  route: ScreenBRouteProp;
 };
 
 const SearchScreen = (props: Props) => {
   const [destination, setDestination] = useState<any[]>([]);
   const [people, setPeople] = useState<any[]>([]);
   const [posts, setPosts] = useState<any[]>([]);
+  const [keyword, setKeyword] = useState<string>(props.route.params.name || '');
 
+  useEffect(() => {
+    if (keyword.trim().length > 0) {
+      handleSearch(keyword);
+    }
+  }, []);
   const fetchSearchDestination = async (keyword: string) => {
     try {
       const response = await apiInstance.get('/search/destination', {
@@ -94,6 +109,8 @@ const SearchScreen = (props: Props) => {
           <TextInput
             placeholder="Tìm kiếm trên Travelolo"
             className="w-5/6 rounded-full bg-gray-300 pl-4 pt-1 pb-1"
+            value={keyword}
+            onChangeText={text => setKeyword(text)}
             onSubmitEditing={e => {
               if (e.nativeEvent.text.trim().length > 0) {
                 handleSearch(e.nativeEvent.text);
@@ -118,11 +135,13 @@ const SearchScreen = (props: Props) => {
                 id={item.id}
                 destination={item.destination}
                 city={item.city}
+                city_id={item.city_id}
                 user_id={item.user_id}
                 avatar={item.avatar !== undefined ? item.avatar : ''}
                 time={item.created_at}
                 description={item.content}
                 like={item.likes_count}
+                isLiked={item.is_liked}
                 tags={item.tags}
                 image={item.image}
                 navigation={props.navigation}

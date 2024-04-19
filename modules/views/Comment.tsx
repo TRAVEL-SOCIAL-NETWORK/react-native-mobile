@@ -2,8 +2,9 @@ import React from 'react';
 import {Image, Text, TouchableOpacity, View} from 'react-native';
 import apiInstance from '../../configs/apiInstance';
 import DateTime from './DateTime';
+import store from '../../libs/redux/store';
 type Props = {
-  id: number;
+  id: string;
   user_id: string;
   name: string;
   avatar: string;
@@ -17,7 +18,17 @@ const Comment = (props: Props) => {
     <View className="flex flex-row items-center justify-between bg-white w-full">
       <View className="flex flex-row items-start justify-start gap-2">
         <TouchableOpacity
-          onPress={() => {}}
+          onPress={() => {
+            if (props.user_id === store.getState().auth.id) {
+              props.navigation.navigate('Profile', {
+                user_id: props.user_id,
+              });
+            } else {
+              props.navigation.navigate('ProfileUser', {
+                user_id: props.user_id,
+              });
+            }
+          }}
           className="rounded-full flex items-center justify-center  border-2 border-gray-300">
           <Image
             source={

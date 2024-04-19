@@ -37,7 +37,7 @@ const MenuScreen = (props: Props) => {
           </View>
           <View className="flex flex-row items-center justify-center gap-2 mr-4">
             <TouchableOpacity
-              onPress={() => props.navigation.navigate('Login')}
+              onPress={() => props.navigation.navigate('Profile')}
               className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-300">
               <Image
                 source={require('../../assets/setting.png')}
@@ -47,7 +47,7 @@ const MenuScreen = (props: Props) => {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => props.navigation.navigate('Search')}
+              onPress={() => props.navigation.navigate('Search', {name: ''})}
               className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-300">
               <Image
                 source={require('../../assets/search.png')}
