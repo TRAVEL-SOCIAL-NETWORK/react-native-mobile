@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {View, Text, TouchableOpacity, TextInput} from 'react-native';
+import {View, Text, TouchableOpacity, TextInput, Image} from 'react-native';
 import apiInstance from '../../configs/apiInstance';
 
 type Props = {
@@ -13,7 +13,6 @@ const RegisterScreen = (props: Props) => {
   const [password, setPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
   const {first_name, last_name} = props.route.params;
-  console.log(first_name, last_name);
 
   const handleRegister = async () => {
     try {
@@ -34,11 +33,14 @@ const RegisterScreen = (props: Props) => {
   };
   return (
     <View className="h-full bg-blue-50">
-      <View className="w-full h-16 m-4">
-        <TouchableOpacity onPress={() => props.navigation.goBack()}>
-          <Text className="text-2xl font-bold ml-2 text-start text-black">
-            {'<'}
-          </Text>
+      <View className="w-full h-16 m-4 flex-row items-center justify-start">
+        <TouchableOpacity
+          onPress={() => props.navigation.goBack()}
+          className="flex-row items-center justify-start w-8 h-8 rounded-full flex items-center justify-center m-2 bg-gray-300">
+          <Image
+            source={require('../../assets/back.png')}
+            className="w-4 h-4"
+          />
         </TouchableOpacity>
         <Text
           className="text-2xl font-bold ml-4 text-start text-black
@@ -68,9 +70,9 @@ const RegisterScreen = (props: Props) => {
         <TextInput
           placeholder="Nhập lại mật khẩu"
           className="text-base border-2 border-gray-300 rounded-md p-2 m-2 w-5/6"
-          value={password}
+          value={confirmPassword}
           onChangeText={text => {
-            setPassword(text);
+            setConfirmPassword(text);
           }}
           secureTextEntry={true}
         />
@@ -81,7 +83,7 @@ const RegisterScreen = (props: Props) => {
           onChangeText={text => {
             setPhone(text);
           }}
-          keyboardType='phone-pad'
+          keyboardType="phone-pad"
         />
 
         <TouchableOpacity

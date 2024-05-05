@@ -8,7 +8,7 @@ import NotifyScreen from '../modules/screens/Notify';
 import AddressScreen from '../modules/screens/Address';
 import io from 'socket.io-client';
 import store from '../libs/redux/store';
-const socket = io('http://192.168.1.4:5000');
+const socket = io('http://192.168.1.5:5000');
 
 type Props = {
   navigation: any;

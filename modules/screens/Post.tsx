@@ -403,7 +403,9 @@ const PostScreen = (props: Props) => {
                 </View>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => props.navigation.navigate('Search')}
+                onPress={() =>
+                  props.navigation.navigate('Search', {name: destination})
+                }
                 className="flex flex-row items-center gap-2">
                 <Image
                   source={require('../../assets/private.png')}

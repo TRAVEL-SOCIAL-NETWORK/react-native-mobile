@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, TextInput, Image} from 'react-native';
+import apiInstance from '../../configs/apiInstance';
 type Props = {
   navigation: any;
 };
@@ -7,6 +8,18 @@ type Props = {
 const FindAccount = (props: Props) => {
   const [email, setEmail] = React.useState('');
 
+  const handleFindAccount = async () => {
+    try {
+      const response = await apiInstance.post('/auth/forgot-password', {
+        email: email,
+      });
+      if (response.data.statusCode === 200) {
+        props.navigation.navigate('Verify', {email: email});
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <View className="h-full bg-blue-50">
       <View className="w-full h-16 m-4">
@@ -48,7 +61,7 @@ const FindAccount = (props: Props) => {
         <TouchableOpacity
           className="bg-blue-500 px-4 py-2 rounded-3xl mt-8 w-5/6"
           onPress={() => {
-            props.navigation.navigate('Verify');
+            handleFindAccount();
           }}>
           <Text className="text-white font-semibold text-center text-base">
             Tiếp tục

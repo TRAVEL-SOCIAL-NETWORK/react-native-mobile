@@ -2,7 +2,7 @@ import axios from 'axios';
 import store from '../libs/redux/store';
 
 const apiInstance = axios.create({
-  baseURL: 'http://192.168.1.4:5000/api',
+  baseURL: 'http://192.168.1.5:5000/api',
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
@@ -11,7 +11,7 @@ const apiInstance = axios.create({
 });
 
 const apiInstanceRefresh = axios.create({
-  baseURL: 'http://192.168.1.4:5000/api',
+  baseURL: 'http://192.168.1.5:5000/api',
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',

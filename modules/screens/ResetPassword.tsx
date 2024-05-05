@@ -1,12 +1,39 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, TextInput, Image} from 'react-native';
+import apiInstance from '../../configs/apiInstance';
+import {RouteProp} from '@react-navigation/native';
+
+type RootStackParamList = {
+  OTP: {
+    otp: number;
+    email: string;
+  };
+};
+type ScreenBRouteProp = RouteProp<RootStackParamList, 'OTP'>;
 type Props = {
   navigation: any;
+  route: ScreenBRouteProp;
 };
 
 const ResetPassword = (props: Props) => {
-  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [confirmPassword, setConfirmPassword] = React.useState('');
 
+  const handleResetPassword = async () => {
+    console.log(props.route.params.email + props.route.params.otp + password);
+    try {
+      const response = await apiInstance.post('/auth/reset-password', {
+        email: props.route.params.email,
+        otp: props.route.params.otp,
+        password: password,
+      });
+      if (response.data.statusCode === 200) {
+        props.navigation.navigate('Login');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <View className="h-full bg-blue-50">
       <View className="w-full h-16 m-4">
@@ -21,7 +48,7 @@ const ResetPassword = (props: Props) => {
         <Text
           className="text-2xl font-bold m-4 text-start text-black
         ">
-          Quên mật khẩu
+          Đặt lại mật khẩu
         </Text>
       </View>
       <View className="flex-[1] items-center justify-center ">
@@ -31,9 +58,9 @@ const ResetPassword = (props: Props) => {
         <TextInput
           placeholder="Mật khẩu mới"
           className="text-base border-2 border-gray-300 rounded-md p-2 m-4 w-5/6"
-          value={email}
+          value={password}
           onChangeText={text => {
-            setEmail(text);
+            setPassword(text);
           }}
           secureTextEntry={true}
         />
@@ -43,9 +70,9 @@ const ResetPassword = (props: Props) => {
         <TextInput
           placeholder="Nhập lại mật khẩu mới "
           className="text-base border-2 border-gray-300 rounded-md p-2 m-4 w-5/6"
-          value={email}
+          value={confirmPassword}
           onChangeText={text => {
-            setEmail(text);
+            setConfirmPassword(text);
           }}
           secureTextEntry={true}
         />
@@ -53,7 +80,7 @@ const ResetPassword = (props: Props) => {
         <TouchableOpacity
           className="bg-blue-500 px-4 py-2 rounded-3xl mt-8 w-5/6"
           onPress={() => {
-            props.navigation.navigate('Login');
+            handleResetPassword();
           }}>
           <Text className="text-white font-semibold text-center text-base">
             Thay đổi mật khẩu
